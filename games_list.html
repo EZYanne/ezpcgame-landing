@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EZPCGames — Game Library</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:        #87CEEB;
+  --blue-mid:    #4fb8e8;
+  --blue-bright: #00d4ff;
+  --blue-deep:   #0066cc;
+  --blue-glow:   rgba(135,206,235,0.35);
+  --radius:      16px;
+  --radius-sm:   10px;
+  --transition:  0.35s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"] {
+  --bg:          #050a0f;
+  --bg-2:        #080d14;
+  --bg-3:        #0b1220;
+  --card-bg:     rgba(8,18,32,0.92);
+  --card-solid:  #08111f;
+  --glass:       rgba(135,206,235,0.06);
+  --glass-border:rgba(135,206,235,0.18);
+  --text:        #e8f4ff;
+  --text-muted:  #7aaec8;
+  --shadow:      rgba(0,0,0,0.6);
+  --nav-bg:      rgba(5,10,15,0.95);
+  --input-bg:    rgba(8,18,32,0.9);
+  --tag-bg:      rgba(135,206,235,0.08);
+}
+[data-theme="light"] {
+  --bg:          #f0f7ff;
+  --bg-2:        #e4f0fb;
+  --bg-3:        #d8eaf7;
+  --card-bg:     rgba(255,255,255,0.95);
+  --card-solid:  #ffffff;
+  --glass:       rgba(0,100,200,0.06);
+  --glass-border:rgba(0,120,220,0.2);
+  --text:        #0d1f33;
+  --text-muted:  #3a6080;
+  --shadow:      rgba(0,60,120,0.12);
+  --nav-bg:      rgba(240,247,255,0.95);
+  --input-bg:    rgba(255,255,255,0.95);
+  --tag-bg:      rgba(0,102,204,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  overflow-x: hidden;
+  transition: background var(--transition), color var(--transition);
+  min-height: 100vh;
+}
+
+#particle-canvas {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; z-index:0; opacity:0.3;
+  transition: opacity var(--transition);
+}
+[data-theme="light"] #particle-canvas { opacity:0.08; }
+
+/* ═══ HEADER ═══ */
+header {
+  position: sticky; top:0; z-index:900;
+  background: var(--nav-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 0 32px;
+  height: 68px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px;
+  transition: background var(--transition), border-color var(--transition);
+}
+@media(max-width:600px){
+  header { padding: 0 14px; height: 56px; }
+}
+.header-left { display:flex; align-items:center; gap:14px; }
+
+.logo-wrap {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.logo-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.logo-icon img { width: 100%; height: 100%; object-fit: contain; }
+.logo-text { display: flex; flex-direction: column; line-height: 1; }
+.logo-main {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px; letter-spacing: 2px;
+  background: linear-gradient(90deg, var(--text) 0%, var(--blue) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.logo-sub { font-size: 9px; font-weight: 600; letter-spacing: 3px; color: var(--blue-mid); text-transform: uppercase; }
+@media(max-width:360px){ .logo-text { display:none; } }
+
+.header-right { display:flex; align-items:center; gap:8px; }
+
+.cart-header-btn {
+  position: relative; width: 44px; height: 44px;
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm); color: var(--text-muted); font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.25s, border-color 0.25s, color 0.25s;
+}
+.cart-header-btn:hover { background: var(--blue-deep); border-color: var(--blue); color:#fff; }
+@media(max-width:480px){ .cart-header-btn { width:40px; height:40px; font-size:15px; } }
+
+.cart-badge {
+  position:absolute; top:-6px; right:-6px;
+  width:20px; height:20px; border-radius:50%;
+  background: linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+  color:#fff; font-size:10px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  border: 2px solid var(--bg); transition: transform 0.2s;
+}
+.cart-badge.bump { animation: badge-bump 0.3s ease; }
+@keyframes badge-bump { 0%{transform:scale(1)} 50%{transform:scale(1.5)} 100%{transform:scale(1)} }
+
+.theme-toggle {
+  width:44px; height:44px; border-radius:50%;
+  background:var(--glass); border:1px solid var(--glass-border);
+  color:var(--text-muted); font-size:15px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition: background 0.25s, color 0.25s, transform 0.2s;
+}
+.theme-toggle:hover { background:var(--blue-deep); border-color:var(--blue); color:#fff; transform:rotate(20deg); }
+@media(max-width:480px){ .theme-toggle { width:40px; height:40px; } }
+
+/* ═══ NEW RELEASES STRIP ═══ */
+.new-releases-strip {
+  position: relative; z-index:1;
+  background: var(--bg-3); border-bottom: 1px solid var(--glass-border);
+  padding: 0 32px; display: flex; align-items: center; gap: 16px;
+  overflow-x: auto; white-space: nowrap;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.new-releases-strip::-webkit-scrollbar { display:none; }
+@media(max-width:600px){ .new-releases-strip { padding: 0 14px; gap:10px; } }
+.new-releases-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--blue); flex-shrink: 0; padding: 14px 0;
+  border-right: 1px solid var(--glass-border); padding-right: 16px;
+}
+@media(max-width:480px){ .new-releases-label { font-size:8px; letter-spacing:2px; padding-right:10px; } }
+.new-releases-items { display: flex; gap: 12px; padding: 10px 0; }
+.new-release-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: 20px; padding: 6px 14px; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s; flex-shrink: 0;
+}
+.new-release-chip:hover { border-color: var(--blue-mid); background: rgba(0,102,204,0.1); }
+.new-release-chip img { width: 22px; height: 22px; border-radius: 4px; object-fit: cover; }
+.new-release-chip-name { font-size: 12px; font-weight: 600; color: var(--text); }
+@media(max-width:480px){ .new-release-chip-name { font-size:11px; } }
+.new-release-chip-badge {
+  font-size: 8px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  background: linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+  color: #fff; padding: 2px 7px; border-radius: 10px;
+}
+
+/* ═══ LAYOUT ═══ */
+.layout {
+  position: relative; z-index:1;
+  max-width: 1800px; margin: 0 auto;
+  padding: 28px 24px 80px;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media(max-width:1100px){
+  .layout { grid-template-columns: 180px 1fr; gap:16px; }
+}
+@media(max-width:900px) {
+  .layout { grid-template-columns: 1fr; padding: 16px 12px 60px; gap:12px; }
+  .sidebar { display:none; }
+}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar {
+  position: sticky; top: 80px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.sidebar-card {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius); padding: 16px;
+  backdrop-filter: blur(16px);
+  transition: background var(--transition), border-color var(--transition);
+}
+.sidebar-title {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--blue); margin-bottom: 12px;
+  display:flex; align-items:center; gap:8px;
+}
+.sidebar-title::before {
+  content:''; display:block; width:16px; height:2px;
+  background:var(--blue); border-radius:2px;
+}
+.genre-list { display:flex; flex-direction:column; gap:4px; }
+.genre-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 7px 10px; border-radius: var(--radius-sm);
+  border: 1px solid transparent; cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  font-size: 12px; font-weight: 500; color: var(--text-muted); user-select:none;
+}
+.genre-item:hover { background: var(--glass); color: var(--text); border-color: var(--glass-border); }
+.genre-item.active { background: rgba(0,102,204,0.18); border-color: var(--blue-mid); color: var(--blue-bright); }
+.genre-count {
+  font-size: 10px; background: var(--tag-bg);
+  padding: 2px 6px; border-radius: 20px;
+  color: var(--text-muted); font-weight: 600;
+}
+.genre-item.active .genre-count { background: rgba(0,212,255,0.15); color: var(--blue-bright); }
+
+.sort-select {
+  width:100%; padding: 9px 12px;
+  background: var(--input-bg); border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-family: 'Poppins', sans-serif; font-size: 12px;
+  outline:none; cursor:pointer; transition: border-color 0.2s;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237aaec8' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+.sort-select:focus { border-color: var(--blue-mid); }
+
+.size-filters { display:flex; flex-direction:column; gap:8px; }
+.size-range {
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:11px; color:var(--text-muted); margin-bottom:2px;
+}
+.range-input {
+  width:100%; height:4px; -webkit-appearance:none; appearance:none;
+  background: linear-gradient(90deg, var(--blue-deep), var(--blue-mid));
+  border-radius:2px; outline:none; cursor:pointer;
+}
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance:none; width:16px; height:16px;
+  border-radius:50%; background: var(--blue-bright);
+  border:2px solid var(--bg); box-shadow:0 0 8px var(--blue-glow); cursor:pointer;
+}
+
+/* ═══ MAIN CONTENT ═══ */
+.main-content { min-width:0; }
+
+.topbar {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom: 20px; flex-wrap:wrap;
+}
+.search-wrap { flex:1; min-width:140px; position:relative; }
+.search-input {
+  width:100%; padding: 10px 14px 10px 40px;
+  background: var(--input-bg); border: 1px solid var(--glass-border);
+  border-radius: 50px; color: var(--text);
+  font-family:'Poppins',sans-serif; font-size:13px; outline:none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.search-input::placeholder { color: var(--text-muted); }
+.search-input:focus { border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+.search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px; pointer-events:none; }
+.search-clear {
+  position:absolute; right:12px; top:50%; transform:translateY(-50%);
+  color:var(--text-muted); font-size:12px; cursor:pointer; display:none;
+  background:none; border:none; padding:2px 6px; transition:color 0.2s;
+}
+.search-clear:hover { color:var(--text); }
+.results-info { font-size:12px; color:var(--text-muted); white-space:nowrap; }
+.results-info strong { color:var(--blue-bright); }
+
+/* Genre pills (mobile) */
+.genre-pills { display:none; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+@media(max-width:900px) { .genre-pills { display:flex; } }
+.genre-pill {
+  padding:5px 12px; border-radius:50px; font-size:11px; font-weight:600;
+  letter-spacing:0.5px; border:1px solid var(--glass-border);
+  background:var(--glass); color:var(--text-muted); cursor:pointer; transition:0.2s; white-space:nowrap;
+}
+.genre-pill.active { background:rgba(0,102,204,0.2); border-color:var(--blue-mid); color:var(--blue-bright); }
+
+/* ═══ GAMES GRID — 7 columns wide ═══ */
+.games-grid {
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap:14px; min-height: 400px;
+}
+@media(max-width:1600px){ .games-grid { grid-template-columns: repeat(6, 1fr); } }
+@media(max-width:1300px){ .games-grid { grid-template-columns: repeat(5, 1fr); } }
+@media(max-width:1100px){ .games-grid { grid-template-columns: repeat(4, 1fr); } }
+@media(max-width:900px) { .games-grid { grid-template-columns: repeat(4, 1fr); gap:10px; } }
+@media(max-width:700px) { .games-grid { grid-template-columns: repeat(3, 1fr); gap:9px; } }
+@media(max-width:500px) { .games-grid { grid-template-columns: repeat(2, 1fr); gap:8px; } }
+@media(max-width:320px) { .games-grid { grid-template-columns: repeat(2, 1fr); gap:6px; } }
+
+.game-card {
+  background: var(--card-bg); border: 1px solid var(--glass-border);
+  border-radius: 14px; overflow:hidden; cursor:pointer; position:relative;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  display:flex; flex-direction:column;
+}
+.game-card:hover {
+  transform:translateY(-5px); border-color:var(--blue);
+  box-shadow:0 14px 36px rgba(0,150,255,0.18);
+}
+.game-card.in-cart { border-color: rgba(0,212,100,0.5); }
+
+.card-img-wrap { position:relative; aspect-ratio:3/4; overflow:hidden; }
+.card-img-wrap img {
+  width:100%; height:100%; object-fit:cover;
+  filter:brightness(0.82) saturate(0.9);
+  transition:transform 0.5s, filter 0.3s;
+}
+.game-card:hover .card-img-wrap img { transform:scale(1.05); filter:brightness(0.1) saturate(1.1); }
+
+/* Hover video — LOCAL VIDEO */
+.card-hover-video-wrap {
+  position:absolute; inset:0; z-index:1;
+  opacity:0; transition: opacity 0.5s ease;
+  pointer-events:none;
+  background:#000;
+}
+.card-hover-video-wrap video {
+  width:100%; height:100%; object-fit:cover;
+  pointer-events:none;
+}
+.game-card:hover .card-hover-video-wrap { opacity:1; }
+
+.card-genre-badge {
+  position:absolute; top:7px; left:7px; z-index:4;
+  font-size:8px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#fff;
+  background:linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+  padding:3px 8px; border-radius:20px;
+}
+.card-size-badge {
+  position:absolute; top:7px; right:7px; z-index:4;
+  font-size:8px; font-weight:700; letter-spacing:1px;
+  background:rgba(0,0,0,0.7); color:var(--blue);
+  padding:3px 7px; border-radius:7px; backdrop-filter:blur(8px);
+  border:1px solid rgba(135,206,235,0.2);
+}
+.card-in-cart-tag {
+  position:absolute; bottom:8px; left:50%; transform:translateX(-50%); z-index:4;
+  font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#fff;
+  background:rgba(0,200,100,0.85); padding:3px 9px; border-radius:20px;
+  opacity:0; transition:opacity 0.3s; white-space:nowrap;
+}
+.game-card.in-cart .card-in-cart-tag { opacity:1; }
+
+/* Card overlay */
+.card-overlay {
+  position:absolute; inset:0; z-index:3;
+  background:linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+  opacity:0; transition:opacity 0.3s;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+  padding-bottom: 12px; gap: 8px;
+}
+.game-card:hover .card-overlay { opacity:1; }
+
+.card-overlay-title {
+  font-size:11px; font-weight:700; color:#fff;
+  text-align:center; padding:0 8px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  position:relative; z-index:2;
+}
+.card-overlay-actions { display:flex; gap:6px; position:relative; z-index:2; }
+.overlay-btn {
+  height:30px; padding:0 10px; border-radius:20px;
+  border:none; font-family:'Poppins',sans-serif; font-size:9px; font-weight:700;
+  letter-spacing:0.5px; text-transform:uppercase;
+  cursor:pointer; display:flex; align-items:center; gap:5px;
+  transform:translateY(10px); transition:transform 0.3s, box-shadow 0.3s, background 0.2s;
+}
+.game-card:hover .overlay-btn { transform:translateY(0); }
+.overlay-btn-primary {
+  background:linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+  color:#fff; box-shadow:0 4px 16px rgba(0,150,255,0.5);
+}
+.overlay-btn-primary:hover { box-shadow:0 6px 24px rgba(0,212,255,0.7); }
+.overlay-btn-cart {
+  background:rgba(255,255,255,0.15); color:#fff;
+  border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(8px);
+}
+.overlay-btn-cart.added { background:rgba(0,200,100,0.25); border-color:rgba(0,220,120,0.5); color:#00e676; }
+.overlay-btn-cart.added:hover { background:rgba(255,50,80,0.3) !important; border-color:rgba(255,80,80,0.6) !important; color:#ff6b6b !important; }
+
+.card-body { padding:8px 10px 6px; flex:1; display:flex; flex-direction:column; gap:3px; }
+.card-title { font-size:11px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.card-meta {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-top:4px; padding-top:6px; border-top:1px solid var(--glass-border);
+}
+.card-rating { display:flex; align-items:center; gap:2px; font-size:9px; color:#ffc107; }
+.card-rating span { color:var(--text-muted); font-size:9px; }
+.card-platform { font-size:9px; color:var(--text-muted); display:flex; align-items:center; gap:3px; }
+
+.card-action { padding:0 10px 10px; }
+.card-add-btn {
+  width:100%; padding:7px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius-sm); color:var(--blue);
+  font-family:'Poppins',sans-serif; font-size:9px; font-weight:600;
+  letter-spacing:1px; text-transform:uppercase;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;
+  transition:background 0.2s, border-color 0.2s, color 0.2s;
+}
+.card-add-btn:hover:not(.added) { background:var(--blue-deep); border-color:var(--blue); color:#fff; }
+.card-add-btn.added { background:rgba(0,180,80,0.15); border-color:rgba(0,220,120,0.45); color:#00cc66; }
+.card-add-btn.added:hover { background:rgba(200,30,50,0.18) !important; border-color:rgba(255,80,80,0.5) !important; color:#ff4455 !important; }
+
+/* ═══ GAME DETAIL MODAL ═══ */
+.modal-backdrop {
+  position:fixed; inset:0; z-index:1000;
+  background:rgba(0,0,0,0.85); backdrop-filter:blur(12px);
+  display:flex; align-items:flex-start; justify-content:center;
+  overflow-y:auto; padding:40px 20px;
+  opacity:0; pointer-events:none; transition:opacity 0.35s;
+}
+.modal-backdrop.open { opacity:1; pointer-events:all; }
+@media(max-width:600px){ .modal-backdrop { padding:0; align-items:flex-end; } }
+
+.modal {
+  background: var(--bg-2); border:1px solid var(--glass-border);
+  border-radius:24px; width:100%; max-width:920px;
+  overflow:hidden; position:relative;
+  transform:scale(0.95) translateY(20px);
+  transition:transform 0.35s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 30px 80px rgba(0,0,0,0.7);
+}
+.modal-backdrop.open .modal { transform:scale(1) translateY(0); }
+@media(max-width:600px){
+  .modal { border-radius:20px 20px 0 0; max-height:92dvh; overflow-y:auto; transform:translateY(40px); }
+  .modal-backdrop.open .modal { transform:translateY(0); }
+}
+
+.modal-hero { position:relative; height:300px; overflow:hidden; }
+@media(max-width:600px){ .modal-hero { height:200px; } }
+@media(max-width:400px){ .modal-hero { height:170px; } }
+
+/* Modal hero can show local video or bg image */
+.modal-hero-bg {
+  position:absolute; inset:-20px;
+  background-size:cover; background-position:center;
+  filter:blur(4px) brightness(0.5) saturate(0.8);
+  transform:scale(1.05);
+}
+.modal-hero-video {
+  position:absolute; inset:0; z-index:0;
+  overflow:hidden;
+}
+.modal-hero-video video {
+  width:100%; height:100%; object-fit:cover;
+  filter:brightness(0.5) saturate(0.8);
+}
+.modal-hero-gradient {
+  position:absolute; inset:0; z-index:1;
+  background:linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(5,10,15,0.6) 60%, var(--bg-2) 100%);
+}
+.modal-hero-content {
+  position:absolute; inset:0; z-index:2;
+  display:flex; gap:24px; align-items:flex-end;
+  padding:24px 32px;
+}
+@media(max-width:600px){ .modal-hero-content { padding:16px; gap:14px; } }
+.modal-cover {
+  width:110px; height:147px; flex-shrink:0;
+  border-radius:14px; overflow:hidden;
+  border:2px solid var(--glass-border);
+  box-shadow:0 12px 40px rgba(0,0,0,0.6);
+}
+@media(max-width:480px){ .modal-cover { width:80px; height:107px; border-radius:10px; } }
+@media(max-width:360px){ .modal-cover { width:66px; height:88px; border-radius:8px; } }
+.modal-cover img { width:100%; height:100%; object-fit:cover; }
+.modal-hero-info { flex:1; min-width:0; padding-bottom:4px; }
+.modal-genre-tag {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--blue-bright); background:rgba(0,150,255,0.15);
+  border:1px solid rgba(0,212,255,0.3); padding:3px 10px; border-radius:20px;
+  margin-bottom:8px;
+}
+.modal-title {
+  font-family:'Bebas Neue',sans-serif; font-size:clamp(20px,4vw,34px); letter-spacing:2px;
+  color:#fff; line-height:1; margin-bottom:8px;
+  text-shadow:0 4px 20px rgba(0,0,0,0.5);
+}
+.modal-rating-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.modal-stars { display:flex; gap:3px; color:#ffc107; font-size:13px; }
+.modal-rating-num { font-size:15px; font-weight:700; color:#fff; }
+.modal-reviews { font-size:10px; color:rgba(255,255,255,0.5); }
+.modal-platform-badge { display:flex; align-items:center; gap:5px; font-size:10px; color:rgba(255,255,255,0.7); font-weight:500; }
+
+.modal-close {
+  position:absolute; top:14px; right:14px; z-index:10;
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.15);
+  color:#fff; font-size:15px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background 0.2s, transform 0.2s; backdrop-filter:blur(8px);
+}
+.modal-close:hover { background:rgba(255,68,102,0.6); transform:rotate(90deg); }
+
+.modal-body { padding:0 28px 28px; }
+@media(max-width:600px){ .modal-body { padding:0 14px 20px; } }
+
+.modal-actions { display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap; margin-top:16px; }
+.modal-btn {
+  height:42px; padding:0 20px; border-radius:var(--radius-sm);
+  border:none; font-family:'Poppins',sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase;
+  cursor:pointer; display:flex; align-items:center; gap:7px; transition:0.2s;
+}
+@media(max-width:400px){ .modal-btn { height:38px; padding:0 14px; font-size:10px; } }
+.modal-btn-primary {
+  background:linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+  color:#fff; box-shadow:0 6px 24px rgba(0,150,255,0.4);
+}
+.modal-btn-primary:hover { box-shadow:0 8px 32px rgba(0,212,255,0.6); transform:translateY(-1px); }
+.modal-btn-primary.added { background:linear-gradient(135deg, #006622, #00aa44); box-shadow:0 6px 24px rgba(0,180,80,0.4); }
+.modal-btn-primary.added:hover { background:linear-gradient(135deg, #880022, #cc2244) !important; box-shadow:0 6px 24px rgba(200,30,60,0.4) !important; }
+.modal-btn-secondary { background:var(--glass); border:1px solid var(--glass-border); color:var(--text-muted); }
+.modal-btn-secondary:hover { border-color:var(--blue-mid); color:var(--blue); }
+
+.modal-tabs {
+  display:flex; gap:0; margin-bottom:20px;
+  border-bottom:1px solid var(--glass-border);
+  overflow-x:auto; scrollbar-width:none;
+}
+.modal-tabs::-webkit-scrollbar { display:none; }
+.modal-tab {
+  padding:9px 16px; font-size:11px; font-weight:600;
+  letter-spacing:0.5px; color:var(--text-muted); cursor:pointer;
+  border-bottom:2px solid transparent; margin-bottom:-1px;
+  transition:color 0.2s, border-color 0.2s; background:none; border-top:none; border-left:none; border-right:none;
+  font-family:'Poppins',sans-serif; white-space:nowrap;
+}
+.modal-tab:hover { color:var(--blue); }
+.modal-tab.active { color:var(--blue-bright); border-bottom-color:var(--blue-bright); }
+
+.tab-panel { display:none; }
+.tab-panel.active { display:block; animation:fade-in-up 0.3s ease; }
+@keyframes fade-in-up { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* Modal trailer — local video player */
+.trailer-wrap {
+  position:relative; aspect-ratio:16/9; border-radius:var(--radius);
+  overflow:hidden; background:#000;
+  border:1px solid var(--glass-border);
+  margin-bottom:16px;
+}
+.trailer-wrap iframe,
+.trailer-wrap video { width:100%; height:100%; border:none; display:block; }
+.trailer-wrap video { object-fit:cover; }
+.trailer-placeholder {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+  background:linear-gradient(135deg, #0a1628, #081320);
+}
+.play-circle {
+  width:68px; height:68px; border-radius:50%;
+  background:linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; color:#fff; cursor:pointer;
+  box-shadow:0 8px 32px rgba(0,150,255,0.5);
+  transition:transform 0.2s, box-shadow 0.2s;
+}
+.play-circle:hover { transform:scale(1.1); box-shadow:0 12px 40px rgba(0,212,255,0.7); }
+.trailer-title { font-size:12px; color:var(--text-muted); }
+.trailer-search-btn {
+  padding:9px 18px; border-radius:var(--radius-sm);
+  background:var(--glass); border:1px solid var(--glass-border);
+  color:var(--blue); font-family:'Poppins',sans-serif; font-size:11px; font-weight:600;
+  cursor:pointer; display:flex; align-items:center; gap:7px;
+  transition:background 0.2s, border-color 0.2s;
+}
+.trailer-search-btn:hover { background:var(--blue-deep); border-color:var(--blue); color:#fff; }
+
+.screenshots-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px; }
+@media(max-width:480px){ .screenshots-row { grid-template-columns:1fr 1fr; } }
+.screenshot-thumb {
+  aspect-ratio:16/9; border-radius:var(--radius-sm);
+  overflow:hidden; border:1px solid var(--glass-border); cursor:pointer;
+  transition:transform 0.2s, border-color 0.2s;
+}
+.screenshot-thumb:hover { transform:scale(1.02); border-color:var(--blue-mid); }
+.screenshot-thumb img { width:100%; height:100%; object-fit:cover; filter:brightness(0.85); transition:filter 0.2s; }
+.screenshot-thumb:hover img { filter:brightness(1); }
+
+.about-description { font-size:13px; line-height:1.8; color:var(--text-muted); margin-bottom:18px; }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media(max-width:480px){ .detail-grid { grid-template-columns:1fr; } }
+.detail-item { background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--radius-sm); padding:12px 14px; }
+.detail-label { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--blue); margin-bottom:3px; }
+.detail-value { font-size:12px; font-weight:500; color:var(--text); }
+
+.specs-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+@media(max-width:600px) { .specs-grid { grid-template-columns:1fr; } }
+.specs-card { background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--radius); padding:18px; }
+.specs-card-title { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--blue-bright); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.spec-row { display:flex; flex-direction:column; gap:2px; margin-bottom:12px; }
+.spec-row:last-child { margin-bottom:0; }
+.spec-label { font-size:9px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1px; }
+.spec-value { font-size:12px; color:var(--text); font-weight:500; }
+
+.reviews-summary {
+  display:flex; gap:20px; align-items:center; margin-bottom:20px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius); padding:18px 20px; flex-wrap:wrap;
+}
+.reviews-score { text-align:center; }
+.reviews-score-num {
+  font-family:'Bebas Neue',sans-serif; font-size:48px; line-height:1;
+  background:linear-gradient(135deg, var(--blue), var(--blue-bright));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.reviews-score-label { font-size:9px; color:var(--text-muted); font-weight:600; letter-spacing:1px; text-transform:uppercase; }
+.reviews-bars { flex:1; min-width:140px; }
+.rating-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+.rating-bar-label { font-size:10px; color:var(--text-muted); width:22px; text-align:right; }
+.rating-bar-bg { flex:1; height:5px; background:var(--glass-border); border-radius:3px; overflow:hidden; }
+.rating-bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg, var(--blue-deep), var(--blue-bright)); transition:width 0.8s ease; }
+.rating-bar-count { font-size:10px; color:var(--text-muted); width:26px; }
+
+.review-list { display:flex; flex-direction:column; gap:12px; }
+.review-card { background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--radius-sm); padding:14px 16px; }
+.review-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
+.review-author { font-size:12px; font-weight:600; color:var(--text); }
+.review-stars { color:#ffc107; font-size:11px; }
+.review-date { font-size:10px; color:var(--text-muted); }
+.review-text { font-size:11px; color:var(--text-muted); line-height:1.6; }
+
+.pagination {
+  display:flex; align-items:center; justify-content:center;
+  gap:6px; margin-top:30px; flex-wrap:wrap;
+}
+.page-btn {
+  min-width:38px; height:38px; padding:0 10px;
+  border-radius:var(--radius-sm);
+  background:var(--glass); border:1px solid var(--glass-border);
+  color:var(--text-muted); font-family:'Poppins',sans-serif;
+  font-size:12px; font-weight:500;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;
+}
+.page-btn:hover { background:var(--blue-deep); border-color:var(--blue); color:#fff; }
+.page-btn.active { background:linear-gradient(135deg, var(--blue-deep), var(--blue-mid)); border-color:transparent; color:#fff; box-shadow:0 4px 16px rgba(0,150,255,0.35); }
+.page-btn:disabled { opacity:0.35; pointer-events:none; }
+
+.empty-state {
+  grid-column:1/-1; text-align:center; padding:60px 20px;
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+}
+.empty-state i { font-size:44px; color:var(--text-muted); opacity:0.4; }
+.empty-state h3 { font-size:18px; font-weight:600; color:var(--text-muted); }
+.empty-state p { font-size:12px; color:var(--text-muted); opacity:0.7; }
+
+.reveal { opacity:0; transform:translateY(20px); transition:opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* Toast */
+.toast-container {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  z-index:2000; display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none;
+}
+.toast {
+  padding:10px 18px; border-radius:50px;
+  background:linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+  color:#fff; font-size:11px; font-weight:600; letter-spacing:0.5px;
+  box-shadow:0 6px 24px rgba(0,150,255,0.4);
+  display:flex; align-items:center; gap:8px;
+  animation:toast-in 0.35s ease, toast-out 0.35s ease 1.8s forwards;
+  white-space:nowrap;
+}
+@media(max-width:480px){ .toast { font-size:10px; padding:9px 14px; } }
+@keyframes toast-in { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes toast-out { from{opacity:1;transform:translateY(0)} to{opacity:0;transform:translateY(-10px)} }
+
+/* Cart Overlay + Drawer */
+.cart-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:800; backdrop-filter:blur(4px); }
+.cart-overlay.open { display:block; animation:fade-in 0.25s ease; }
+@keyframes fade-in { from{opacity:0} to{opacity:1} }
+.cart-drawer {
+  position:fixed; top:0; right:0; bottom:0; width:min(360px,100%);
+  z-index:850; display:flex; flex-direction:column;
+  background:var(--bg-2); border-left:1px solid var(--glass-border);
+  transform:translateX(100%); transition:transform 0.35s cubic-bezier(.4,0,.2,1); overflow:hidden;
+}
+.cart-drawer.open { transform:translateX(0); }
+@media(max-width:400px){ .cart-drawer { width:100%; } }
+.cart-header {
+  padding:18px 18px 14px; border-bottom:1px solid var(--glass-border);
+  display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+  background:var(--bg-3);
+}
+.cart-header-title {
+  font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--blue);
+  display:flex; align-items:center; gap:8px;
+}
+.cart-header-title::before { content:''; display:block; width:16px; height:2px; background:var(--blue); border-radius:2px; }
+.cart-count-pill { background:linear-gradient(135deg, var(--blue-deep), var(--blue-mid)); color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
+.cart-clear-btn {
+  background:none; border:none; color:var(--text-muted); font-size:11px;
+  cursor:pointer; padding:4px 8px; border-radius:6px;
+  transition:color 0.2s, background 0.2s; font-family:'Poppins',sans-serif;
+}
+.cart-clear-btn:hover { color:#ff4466; background:rgba(255,68,102,0.1); }
+.cart-items { flex:1; overflow-y:auto; padding:12px 18px; display:flex; flex-direction:column; gap:9px; }
+.cart-items::-webkit-scrollbar { width:4px; }
+.cart-items::-webkit-scrollbar-thumb { background:var(--glass-border); border-radius:2px; }
+.cart-empty { text-align:center; padding:40px 20px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+.cart-empty i { font-size:34px; color:var(--text-muted); opacity:0.3; }
+.cart-empty p { font-size:12px; color:var(--text-muted); opacity:0.6; }
+.cart-item {
+  display:flex; gap:10px; align-items:flex-start;
+  background:var(--glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius-sm); padding:9px 11px; transition:border-color 0.2s;
+  animation: cart-slide-in 0.3s ease;
+}
+@keyframes cart-slide-in { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+.cart-item:hover { border-color:var(--blue-mid); }
+.cart-item-img { width:44px; height:59px; border-radius:7px; object-fit:cover; flex-shrink:0; filter:brightness(0.85); }
+.cart-item-info { flex:1; min-width:0; }
+.cart-item-title { font-size:12px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cart-item-genre { font-size:10px; color:var(--blue); letter-spacing:0.5px; margin-top:2px; }
+.cart-item-size { font-size:10px; color:var(--text-muted); margin-top:3px; display:flex; align-items:center; gap:4px; }
+.cart-item-size-val { font-weight:600; color:var(--blue-bright); }
+.cart-remove { background:none; border:none; color:var(--text-muted); font-size:13px; cursor:pointer; padding:2px; flex-shrink:0; transition:color 0.2s, transform 0.2s; }
+.cart-remove:hover { color:#ff4466; transform:scale(1.2); }
+.cart-footer { padding:14px 18px 18px; border-top:1px solid var(--glass-border); flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+.storage-summary { background:rgba(0,102,204,0.1); border:1px solid rgba(0,150,255,0.2); border-radius:var(--radius-sm); padding:11px 13px; }
+.storage-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:7px; }
+.storage-label { font-size:10px; color:var(--text-muted); }
+.storage-value { font-size:11px; font-weight:700; color:var(--blue-bright); }
+.storage-bar-wrap { height:4px; background:var(--glass-border); border-radius:3px; overflow:hidden; }
+.storage-bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg, var(--blue-deep), var(--blue-bright)); transition:width 0.5s ease; box-shadow:0 0 8px rgba(0,212,255,0.4); }
+.storage-breakdown { margin-top:7px; display:flex; flex-direction:column; gap:3px; }
+.storage-game-row { display:flex; justify-content:space-between; align-items:center; font-size:10px; }
+.storage-game-name { color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
+.storage-game-size { color:var(--blue); font-weight:600; white-space:nowrap; }
+.storage-divider { border:none; border-top:1px dashed var(--glass-border); margin:5px 0; }
+.storage-total-row { display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:700; }
+.storage-total-label { color:var(--text); }
+.storage-total-val { color:var(--blue-bright); font-size:13px; }
+.checkout-btn {
+  width:100%; padding:12px;
+  background:linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+  color:#fff; border:none; border-radius:var(--radius-sm);
+  font-family:'Poppins',sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;
+  box-shadow:0 6px 24px rgba(0,150,255,0.35); transition:box-shadow 0.2s, transform 0.2s;
+}
+.checkout-btn:hover { box-shadow:0 10px 32px rgba(0,212,255,0.5); transform:translateY(-2px); }
+.checkout-btn:disabled { opacity:0.4; pointer-events:none; }
+
+/* ═══ FOOTER ═══ */
+.page-footer {
+  position:relative; z-index:1;
+  background:var(--bg-2); border-top:1px solid var(--glass-border);
+  padding:36px 32px 24px;
+  transition:background var(--transition);
+}
+@media(max-width:600px){ .page-footer { padding:28px 16px 20px; } }
+.footer-inner {
+  max-width:1800px; margin:0 auto;
+  display:grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap:28px;
+  margin-bottom:28px;
+}
+@media(max-width:900px){ .footer-inner { grid-template-columns: 1fr 1fr; gap:20px; } }
+@media(max-width:500px){ .footer-inner { grid-template-columns: 1fr; gap:18px; } }
+.footer-brand .logo-main { font-size:22px; }
+.footer-brand p { font-size:12px; color:var(--text-muted); line-height:1.6; margin-top:9px; max-width:240px; }
+.footer-col-title { font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--blue); margin-bottom:12px; }
+.footer-links { display:flex; flex-direction:column; gap:7px; }
+.footer-links a { font-size:12px; color:var(--text-muted); text-decoration:none; transition:color 0.2s; }
+.footer-links a:hover { color:var(--blue-bright); }
+.footer-bottom {
+  border-top:1px solid var(--glass-border); padding-top:18px;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  font-size:11px; color:var(--text-muted);
+}
+.footer-bottom span { color:var(--blue); }
+.social-row { display:flex; gap:8px; }
+.social-btn {
+  width:32px; height:32px; border-radius:7px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  color:var(--text-muted); font-size:13px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:0.2s; text-decoration:none;
+}
+.social-btn:hover { background:var(--blue-deep); border-color:var(--blue); color:#fff; }
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+<div class="toast-container" id="toast-container"></div>
+<div class="cart-overlay" id="cart-overlay" onclick="closeDrawer()"></div>
+
+<!-- Cart Drawer -->
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-header">
+    <div class="cart-header-title">Cart</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="cart-count-pill" id="drawer-count-pill">0</span>
+      <button class="cart-clear-btn" onclick="clearCart()">Clear All</button>
+      <button style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;" onclick="closeDrawer()"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="cart-items" id="drawer-cart-items"></div>
+  <div class="cart-footer" id="drawer-cart-footer"></div>
+</div>
+
+<!-- Game Detail Modal -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="handleModalBackdropClick(event)">
+  <div class="modal" id="game-modal">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-hero">
+      <div class="modal-hero-bg" id="modal-hero-bg"></div>
+      <div class="modal-hero-video" id="modal-hero-video" style="display:none;">
+        <video id="modal-hero-vid" autoplay muted loop playsinline></video>
+      </div>
+      <div class="modal-hero-gradient"></div>
+      <div class="modal-hero-content">
+        <div class="modal-cover"><img id="modal-cover-img" src="" alt=""></div>
+        <div class="modal-hero-info">
+          <div class="modal-genre-tag" id="modal-genre-tag"></div>
+          <div class="modal-title" id="modal-title"></div>
+          <div class="modal-rating-row">
+            <div class="modal-stars" id="modal-stars"></div>
+            <span class="modal-rating-num" id="modal-rating-num"></span>
+            <span class="modal-reviews" id="modal-reviews"></span>
+            <span class="modal-platform-badge"><i class="fab fa-windows"></i> <span id="modal-platform"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-primary" id="modal-cart-btn" onclick="modalToggleCart()">
+          <i class="fas fa-cart-plus" id="modal-cart-icon"></i>
+          <span id="modal-cart-btn-text">Add to Cart</span>
+        </button>
+        <button class="modal-btn modal-btn-secondary" onclick="openTrailerTab()">
+          <i class="fas fa-play"></i> Watch Trailer
+        </button>
+        <button class="modal-btn modal-btn-secondary" onclick="showToast('<i class=\'fas fa-heart\'></i> Added to Wishlist')">
+          <i class="fas fa-heart"></i> Wishlist
+        </button>
+      </div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchTab('trailer')">Trailer</button>
+        <button class="modal-tab" onclick="switchTab('about')">About</button>
+        <button class="modal-tab" onclick="switchTab('specs')">System Specs</button>
+        <button class="modal-tab" onclick="switchTab('reviews')">Reviews</button>
+      </div>
+      <div class="tab-panel active" id="tab-trailer">
+        <div class="trailer-wrap" id="modal-trailer-wrap">
+          <!-- local video or placeholder rendered dynamically -->
+        </div>
+        <div class="screenshots-row" id="modal-screenshots"></div>
+      </div>
+      <div class="tab-panel" id="tab-about">
+        <p class="about-description" id="modal-description"></p>
+        <div class="detail-grid" id="modal-details"></div>
+      </div>
+      <div class="tab-panel" id="tab-specs">
+        <div class="specs-grid" id="modal-specs"></div>
+      </div>
+      <div class="tab-panel" id="tab-reviews">
+        <div class="reviews-summary">
+          <div class="reviews-score">
+            <div class="reviews-score-num" id="modal-score-num"></div>
+            <div class="reviews-score-label">User Score</div>
+          </div>
+          <div class="reviews-bars" id="modal-rating-bars"></div>
+        </div>
+        <div class="review-list" id="modal-reviews-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <a href="#" class="logo-wrap">
+      <div class="logo-icon">
+        <img src="img/logo.png" alt="EZPCGames"
+             onerror="this.parentElement.innerHTML='<i class=\'fas fa-gamepad\' style=\'font-size:20px;color:#fff;\'></i>'">
+      </div>
+      <div class="logo-text">
+        <span class="logo-main">EZPCGames</span>
+        <span class="logo-sub">Game Library</span>
+      </div>
+    </a>
+  </div>
+  <div class="header-right">
+    <button class="cart-header-btn" onclick="openDrawer()" title="View Cart">
+      <i class="fas fa-shopping-cart"></i>
+      <span class="cart-badge" id="cart-badge">0</span>
+    </button>
+    <button class="theme-toggle" id="theme-btn" title="Toggle theme">
+      <i class="fas fa-moon" id="theme-icon"></i>
+    </button>
+  </div>
+</header>
+
+<!-- NEW RELEASES STRIP -->
+<div class="new-releases-strip">
+  <div class="new-releases-label">New Releases</div>
+  <div class="new-releases-items" id="new-releases-items"></div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-title">Genre</div>
+      <div class="genre-list" id="genre-list-desktop"></div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">Sort By</div>
+      <select class="sort-select" id="sort-select">
+        <option value="default">Default</option>
+        <option value="name-asc">Name A–Z</option>
+        <option value="name-desc">Name Z–A</option>
+        <option value="rating-desc">Top Rated</option>
+        <option value="size-asc">Size: Small → Large</option>
+        <option value="size-desc">Size: Large → Small</option>
+      </select>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">Max Size</div>
+      <div class="size-filters">
+        <div class="size-range">
+          <span>0 GB</span>
+          <span id="size-label" style="color:var(--blue-bright);font-weight:600;">100 GB</span>
+        </div>
+        <input type="range" class="range-input" id="size-range" min="0" max="100" value="100" step="1">
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Show games up to this size</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="genre-pills" id="genre-pills-mobile"></div>
+    <div class="topbar">
+      <div class="search-wrap">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" id="search-input" placeholder="Search games…">
+        <button class="search-clear" id="search-clear" onclick="clearSearch()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="results-info" id="results-info">Loading…</div>
+    </div>
+    <div class="games-grid" id="games-grid"></div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="page-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo-wrap" style="margin-bottom:0;">
+        <div class="logo-icon" style="width:34px;height:34px;">
+          <img src="img/logo.png" alt="EZPCGames"
+               onerror="this.parentElement.innerHTML='<i class=\'fas fa-gamepad\' style=\'font-size:16px;color:#fff;\'></i>'">
+        </div>
+        <div class="logo-text">
+          <span class="logo-main">EZPCGames</span>
+          <span class="logo-sub">Game Library</span>
+        </div>
+      </div>
+      <p>Your one-stop PC game library for the Philippines. All titles pre-verified and ready to install.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Library</div>
+      <div class="footer-links">
+        <a href="#">All Games</a><a href="#">New Releases</a>
+        <a href="#">Top Rated</a><a href="#">Action RPG</a><a href="#">Fighting</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Support</div>
+      <div class="footer-links">
+        <a href="#">How to Install</a><a href="#">System Requirements</a>
+        <a href="#">FAQ</a><a href="#">Contact Us</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a href="#">Terms of Service</a><a href="#">Privacy Policy</a>
+        <a href="#">DMCA</a><a href="#">Game Licenses</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2025 <span>EZPCGames</span>. All game titles are property of their respective owners.</span>
+    <div class="social-row">
+      <a class="social-btn" href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a class="social-btn" href="#" title="Discord"><i class="fab fa-discord"></i></a>
+      <a class="social-btn" href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+      <a class="social-btn" href="#" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   LOCAL VIDEO TRAILER MAP
+   Keys = game ID, values = path to local .mp4 file
+   Add / adjust paths to match where your files actually are.
+══════════════════════════════════════════════════════════════ */
+const GAME_LOCAL_VIDEOS = {
+  1:  "game_video/God of War Ragnarok Trailer.mp4",
+  2:  "game_video/Marvel's Spider-Man 2 Trailer.mp4",
+  3:  "game_video/Tekken 8 Trailer.mp4",
+  4:  "game_video/Hogwarts Trailer.mp4",
+  // Add more here: 5: "game_video/RDR2 Trailer.mp4", etc.
+};
+
+/* ══ YouTube fallback search URLs (used if no local video) ══ */
+const GAME_YOUTUBE_SEARCH = {
+  1: "https://www.youtube.com/results?search_query=God+of+War+Ragnarok+official+trailer",
+  2: "https://www.youtube.com/watch?v=9fVYKsEmuRo",
+  3: "https://www.youtube.com/results?search_query=Tekken+8+official+trailer",
+  4: "https://www.youtube.com/results?search_query=Hogwarts+Legacy+official+trailer",
+  5: "https://www.youtube.com/results?search_query=Red+Dead+Redemption+2+official+trailer",
+  6: "https://www.youtube.com/results?search_query=Elden+Ring+official+trailer",
+  7: "https://www.youtube.com/results?search_query=Cyberpunk+2077+official+trailer",
+  8: "https://www.youtube.com/results?search_query=The+Witcher+3+Wild+Hunt+official+trailer",
+  9: "https://www.youtube.com/results?search_query=FIFA+24+official+trailer",
+  10:"https://www.youtube.com/results?search_query=Call+of+Duty+Modern+Warfare+III+official+trailer",
+  11:"https://www.youtube.com/results?search_query=Mortal+Kombat+1+official+trailer",
+  12:"https://www.youtube.com/results?search_query=Baldurs+Gate+3+official+trailer",
+  13:"https://www.youtube.com/results?search_query=Resident+Evil+4+Remake+official+trailer",
+  14:"https://www.youtube.com/results?search_query=Forza+Horizon+5+official+trailer",
+  15:"https://www.youtube.com/results?search_query=Hades+2+official+trailer",
+  16:"https://www.youtube.com/results?search_query=Lies+of+P+official+trailer",
+  17:"https://www.youtube.com/results?search_query=Sea+of+Stars+official+trailer",
+  18:"https://www.youtube.com/results?search_query=Armored+Core+VI+official+trailer",
+  19:"https://www.youtube.com/results?search_query=Street+Fighter+6+official+trailer",
+  20:"https://www.youtube.com/results?search_query=Dave+the+Diver+official+trailer",
+  21:"https://www.youtube.com/results?search_query=Gran+Turismo+7+official+trailer",
+  22:"https://www.youtube.com/results?search_query=Starfield+official+trailer",
+  23:"https://www.youtube.com/results?search_query=Alan+Wake+2+official+trailer",
+  24:"https://www.youtube.com/results?search_query=Super+Mario+Wonder+official+trailer",
+  25:"https://www.youtube.com/results?search_query=Hi-Fi+Rush+official+trailer",
+  26:"https://www.youtube.com/results?search_query=Diablo+IV+official+trailer",
+  27:"https://www.youtube.com/results?search_query=Final+Fantasy+XVI+official+trailer",
+  28:"https://www.youtube.com/results?search_query=Counter-Strike+2+official+trailer",
+  29:"https://www.youtube.com/results?search_query=Stardew+Valley+official+trailer",
+  30:"https://www.youtube.com/results?search_query=Apex+Legends+official+trailer",
+};
+
+const GAME_DESCRIPTIONS = {
+  1: "Embark on an epic Norse odyssey with Kratos and Atreus as they journey across the Nine Realms to prevent Ragnarök. Featuring breathtaking vistas, visceral combat, and an emotionally charged father-son story, God of War: Ragnarök is a masterpiece of action-adventure storytelling.",
+  2: "Swing through a sprawling open-world New York City as both Peter Parker and Miles Morales in this blockbuster superhero adventure. Marvel's Spider-Man 2 delivers an unprecedented dual-hero experience packed with iconic villains, cinematic set-pieces, and heart-pounding combat.",
+  3: "The King of Iron Fist Tournament returns with Tekken 8, redefining the fighting game genre with its Heat System, stunning Unreal Engine 5 visuals, and the deepest roster in franchise history.",
+  4: "Live the unwritten. Attend Hogwarts in the 1800s, master ancient magic, and uncover a dangerous conspiracy threatening the wizarding world. Hogwarts Legacy is the ultimate open-world RPG for every Harry Potter fan.",
+  5: "Experience the sprawling epic of outlaw life in America's unforgiving heartland. Red Dead Redemption 2 is Rockstar Games' masterwork — an immersive journey through a world of breathtaking beauty and brutal consequence.",
+  6: "Rise, Tarnished, and forge your destiny. FromSoftware's open-world magnum opus features dynamic combat, hundreds of hours of exploration, and a hauntingly beautiful world crafted alongside George R.R. Martin.",
+  7: "Live the future. Night City is a dangerous megalopolis, and V is a mercenary outlaw going after a one-of-a-kind implant that is the key to immortality. A story-driven open-world RPG.",
+  8: "The Witcher 3 is the ultimate RPG adventure — a massive open world, rich story, and hundreds of hours of meaningful choices. Follow Geralt of Rivia as he searches for his missing daughter.",
+  9: "The world's #1 football simulation returns with revolutionary improvements to gameplay and Ultimate Team.",
+  10:"The most advanced Call of Duty yet. MW III delivers the largest Multiplayer offering in franchise history, a new open-world Zombies experience, and a gripping campaign.",
+  11:"A new era of Mortal Kombat. MK1 reboots the iconic franchise with a new timeline, stunning visuals, and the deepest roster yet.",
+  12:"An epic RPG that lets you create your own story. Baldur's Gate 3 features incredible character customization, deep tactical combat, and a world that reacts to every choice you make.",
+  13:"The legendary survival horror game returns, completely rebuilt from the ground up. RE4 Remake retains the essence of the original while delivering a modern gaming experience.",
+  14:"Explore a breathtaking open world across Mexico — the largest and most diverse Horizon map yet.",
+  15:"The next chapter in Supergiant's roguelike masterpiece. Play as Melinoë, daughter of Hades, and battle through the underworld.",
+  16:"A dark fairytale soulslike set in a grotesque Belle Époque world. Lies of P follows Pinocchio's journey through the shattered city of Krat.",
+  17:"A beautiful 16-bit inspired RPG from the creators of The Messenger. Turn-based combat and breathtaking landscapes await.",
+  18:"Take to the skies in brutal mech combat. Armored Core VI: Fires of Rubicon is FromSoftware's triumphant return.",
+  19:"Street Fighter 6 introduces the innovative Drive System and World Tour mode, making it the most accessible yet deep entry in the series.",
+  20:"Manage a sushi restaurant by day, dive for exotic sea life by night. Dave the Diver blends genres in delightfully unexpected ways.",
+  21:"The pinnacle of racing simulation. Gran Turismo 7 pushes the boundaries of what's possible in a racing game.",
+  22:"Bethesda's first new universe in 25 years. Starfield is the ultimate space exploration RPG with over 1,000 planets to discover.",
+  23:"A psychological horror thriller that blurs the lines between story and game. Alan Wake 2 is Remedy Entertainment's magnum opus.",
+  24:"Nintendo's most creative 2D Mario adventure. Super Mario Wonder introduces the Flower Power mechanic that transforms every level.",
+  25:"Feel the beat in this rhythm-action adventure. Hi-Fi Rush is a cel-shaded stylefest where everything pulses to the music.",
+  26:"Return to Sanctuary in this expansive action RPG sequel. Diablo IV introduces an open world, five character classes, and endless loot.",
+  27:"A dark fantasy epic reimagining Final Fantasy. FFXVI delivers pulse-pounding action combat and the most spectacular boss fights in series history.",
+  28:"The next evolution of Counter-Strike. CS2 rebuilds the world's most popular tactical shooter from the ground up with Source 2.",
+  29:"The beloved farming RPG that never grows old. Plant crops, build relationships, and create your dream farm in Pelican Town.",
+  30:"Dive into the free-to-play battle royale phenomenon. Apex Legends features fast-paced squad combat and unique legend abilities.",
+};
+
+const GAME_SPECS = {
+  default: {
+    min: { os:"Windows 10 64-bit", cpu:"Intel Core i5-8400 / AMD Ryzen 5 2600X", ram:"8 GB", gpu:"NVIDIA GTX 1060 6GB / AMD RX 5500 XT 8GB", dx:"DirectX 12", storage:"See size badge" },
+    rec: { os:"Windows 10/11 64-bit", cpu:"Intel Core i7-11700K / AMD Ryzen 9 5900X", ram:"16 GB", gpu:"NVIDIA RTX 3080 / AMD RX 6800 XT", dx:"DirectX 12", storage:"SSD Recommended" }
+  }
+};
+
+const GAME_REVIEWS = {
+  default: [
+    { author:"TechGamer_PH", stars:5, date:"Mar 2024", text:"Absolutely stunning. One of the best gaming experiences I've had in years. The story, gameplay, and visuals are all top-notch." },
+    { author:"NightOwlPlays", stars:4, date:"Feb 2024", text:"Great game overall. Some minor performance issues on older hardware but nothing game-breaking. Highly recommended for fans of the genre." },
+    { author:"CafeShopGamer", stars:5, date:"Jan 2024", text:"Worth every peso. I've been playing non-stop since installation. The world-building is incredible." },
+  ]
+};
+
+const GAMES = [
+  { id:1,  title:"God of War: Ragnarök",       genre:"Action Adventure", rating:5.0, platform:"PC",  size:45.6,  img:"img/GodRagnarok.jpg",  badge:"Hot" },
+  { id:2,  title:"Marvel's Spider-Man 2",       genre:"Action Adventure", rating:4.8, platform:"PC",  size:72.0,  img:"img/Spider2.jpeg",     badge:"New" },
+  { id:3,  title:"Tekken 8",                    genre:"Fighting",         rating:4.7, platform:"PC",  size:60.0,  img:"img/Tekken8.jpg",      badge:"Top" },
+  { id:4,  title:"Hogwarts Legacy",             genre:"Action RPG",       rating:4.9, platform:"PC",  size:76.0,  img:"img/Hogwarts.jpg",     badge:"" },
+  { id:5,  title:"Red Dead Redemption 2",       genre:"Action Adventure", rating:5.0, platform:"PC",  size:150.0, img:"img/RDR2.jpg",         badge:"" },
+  { id:6,  title:"Elden Ring",                  genre:"Action RPG",       rating:5.0, platform:"PC",  size:60.0,  img:"https://placehold.co/220x293/050a0f/00d4ff?text=Elden+Ring",      badge:"Top" },
+  { id:7,  title:"Cyberpunk 2077",              genre:"RPG",              rating:4.6, platform:"PC",  size:70.0,  img:"https://placehold.co/220x293/050a0f/ff4488?text=Cyberpunk+2077",  badge:"" },
+  { id:8,  title:"The Witcher 3",               genre:"RPG",              rating:5.0, platform:"PC",  size:35.0,  img:"https://placehold.co/220x293/050a0f/ffcc00?text=Witcher+3",       badge:"" },
+  { id:9,  title:"FIFA 24",                     genre:"Sports",           rating:4.1, platform:"PC",  size:50.0,  img:"https://placehold.co/220x293/050a0f/00cc44?text=FIFA+24",         badge:"" },
+  { id:10, title:"Call of Duty: MW III",        genre:"FPS",              rating:4.2, platform:"PC",  size:102.0, img:"https://placehold.co/220x293/050a0f/ff8800?text=COD+MWIII",      badge:"New" },
+  { id:11, title:"Mortal Kombat 1",             genre:"Fighting",         rating:4.5, platform:"PC",  size:100.0, img:"https://placehold.co/220x293/050a0f/cc0000?text=MK1",            badge:"" },
+  { id:12, title:"Baldur's Gate 3",             genre:"RPG",              rating:5.0, platform:"PC",  size:122.0, img:"https://placehold.co/220x293/050a0f/aa44ff?text=BG3",            badge:"Top" },
+  { id:13, title:"Resident Evil 4 Remake",      genre:"Horror",           rating:4.9, platform:"PC",  size:67.0,  img:"https://placehold.co/220x293/050a0f/006633?text=RE4",            badge:"" },
+  { id:14, title:"Forza Horizon 5",             genre:"Racing",           rating:4.8, platform:"PC",  size:103.0, img:"https://placehold.co/220x293/050a0f/ff6600?text=Forza+H5",      badge:"" },
+  { id:15, title:"Hades II",                    genre:"Indie",            rating:4.9, platform:"PC",  size:15.0,  img:"https://placehold.co/220x293/050a0f/cc44aa?text=Hades+II",      badge:"New" },
+  { id:16, title:"Lies of P",                   genre:"Action RPG",       rating:4.5, platform:"PC",  size:22.0,  img:"https://placehold.co/220x293/050a0f/556677?text=Lies+of+P",     badge:"" },
+  { id:17, title:"Sea of Stars",                genre:"Indie",            rating:4.7, platform:"PC",  size:3.8,   img:"https://placehold.co/220x293/050a0f/0088cc?text=Sea+of+Stars",  badge:"" },
+  { id:18, title:"Armored Core VI",             genre:"Action",           rating:4.6, platform:"PC",  size:60.0,  img:"https://placehold.co/220x293/050a0f/444444?text=AC6",           badge:"" },
+  { id:19, title:"Street Fighter 6",            genre:"Fighting",         rating:4.8, platform:"PC",  size:45.0,  img:"https://placehold.co/220x293/050a0f/ff2200?text=SF6",           badge:"" },
+  { id:20, title:"Dave the Diver",              genre:"Indie",            rating:4.6, platform:"PC",  size:2.5,   img:"https://placehold.co/220x293/050a0f/009988?text=Dave",          badge:"" },
+  { id:21, title:"Gran Turismo 7",              genre:"Racing",           rating:4.4, platform:"PC",  size:110.0, img:"https://placehold.co/220x293/050a0f/cc2200?text=GT7",           badge:"" },
+  { id:22, title:"Starfield",                   genre:"RPG",              rating:4.0, platform:"PC",  size:139.0, img:"https://placehold.co/220x293/050a0f/112244?text=Starfield",     badge:"" },
+  { id:23, title:"Alan Wake 2",                 genre:"Horror",           rating:4.7, platform:"PC",  size:90.0,  img:"https://placehold.co/220x293/050a0f/003355?text=AW2",           badge:"" },
+  { id:24, title:"Super Mario Wonder",          genre:"Platformer",       rating:4.9, platform:"PC",  size:5.5,   img:"https://placehold.co/220x293/050a0f/ee4400?text=Mario+Wonder",  badge:"" },
+  { id:25, title:"Hi-Fi Rush",                  genre:"Action",           rating:4.8, platform:"PC",  size:23.0,  img:"https://placehold.co/220x293/050a0f/ff0088?text=Hi-Fi+Rush",   badge:"" },
+  { id:26, title:"Diablo IV",                   genre:"Action RPG",       rating:4.3, platform:"PC",  size:90.0,  img:"https://placehold.co/220x293/050a0f/660000?text=Diablo+IV",    badge:"" },
+  { id:27, title:"Final Fantasy XVI",           genre:"Action RPG",       rating:4.6, platform:"PC",  size:83.0,  img:"https://placehold.co/220x293/050a0f/996600?text=FF+XVI",       badge:"" },
+  { id:28, title:"Counter-Strike 2",            genre:"FPS",              rating:4.4, platform:"PC",  size:35.0,  img:"https://placehold.co/220x293/050a0f/cc8800?text=CS2",          badge:"" },
+  { id:29, title:"Stardew Valley",              genre:"Indie",            rating:5.0, platform:"PC",  size:0.5,   img:"https://placehold.co/220x293/050a0f/44aa44?text=Stardew",      badge:"" },
+  { id:30, title:"Apex Legends",                genre:"FPS",              rating:4.3, platform:"PC",  size:100.0, img:"https://placehold.co/220x293/050a0f/cc4400?text=Apex",         badge:"" },
+];
+
+/* ══ STATE ══ */
+let cart = [];
+let activeGenre = "All";
+let currentSearch = "";
+let currentPage = 1;
+let currentSort = "default";
+let maxSize = 150;
+let currentModalGame = null;
+const PAGE_SIZE = 14; // more per page to fill 7-col grid
+
+/* ══ HELPERS ══ */
+function formatSize(gb) {
+  if (gb < 1) return (gb * 1024).toFixed(0) + ' MB';
+  return gb % 1 === 0 ? gb + ' GB' : gb.toFixed(1) + ' GB';
+}
+function renderStars(rating) {
+  const full = Math.floor(rating);
+  const half = rating % 1 >= 0.5 ? 1 : 0;
+  const empty = 5 - full - half;
+  return '<i class="fas fa-star"></i>'.repeat(full) +
+         '<i class="fas fa-star-half-alt"></i>'.repeat(half) +
+         '<i class="far fa-star"></i>'.repeat(empty) +
+         ` <span>${rating.toFixed(1)}</span>`;
+}
+
+/* ══ NEW RELEASES STRIP ══ */
+function buildNewReleasesStrip() {
+  const newGames = GAMES.filter(g => g.badge === 'New' || g.badge === 'Hot').slice(0, 8);
+  const strip = document.getElementById('new-releases-items');
+  newGames.forEach(g => {
+    const chip = document.createElement('div');
+    chip.className = 'new-release-chip';
+    chip.innerHTML = `
+      <img src="${g.img}" onerror="this.src='https://placehold.co/22x22/050a0f/00d4ff?text=?'" alt="${g.title}">
+      <span class="new-release-chip-name">${g.title}</span>
+      <span class="new-release-chip-badge">${g.badge}</span>`;
+    chip.addEventListener('click', () => openModal(g.id));
+    strip.appendChild(chip);
+  });
+}
+
+/* ══ GENRE LISTS ══ */
+function getGenres() {
+  const counts = {};
+  GAMES.forEach(g => { counts[g.genre] = (counts[g.genre]||0)+1; });
+  return [["All", GAMES.length], ...Object.entries(counts).sort((a,b)=>b[1]-a[1])];
+}
+function buildGenreLists() {
+  const genres = getGenres();
+  const desktop = document.getElementById('genre-list-desktop');
+  const mobile  = document.getElementById('genre-pills-mobile');
+  genres.forEach(([name, count]) => {
+    const item = document.createElement('div');
+    item.className = 'genre-item' + (name === activeGenre ? ' active' : '');
+    item.innerHTML = `<span>${name}</span><span class="genre-count">${count}</span>`;
+    item.addEventListener('click', () => setGenre(name));
+    desktop.appendChild(item);
+    const pill = document.createElement('div');
+    pill.className = 'genre-pill' + (name === activeGenre ? ' active' : '');
+    pill.textContent = name;
+    pill.addEventListener('click', () => setGenre(name));
+    mobile.appendChild(pill);
+  });
+}
+function setGenre(name) {
+  activeGenre = name; currentPage = 1;
+  document.querySelectorAll('.genre-item').forEach(el => {
+    el.classList.toggle('active', el.querySelector('span').textContent === name);
+  });
+  document.querySelectorAll('.genre-pill').forEach(el => {
+    el.classList.toggle('active', el.textContent === name);
+  });
+  renderGames();
+}
+
+/* ══ FILTER + SORT ══ */
+function getFiltered() {
+  let list = [...GAMES];
+  if (activeGenre !== "All") list = list.filter(g => g.genre === activeGenre);
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    list = list.filter(g => g.title.toLowerCase().includes(q) || g.genre.toLowerCase().includes(q));
+  }
+  list = list.filter(g => g.size <= maxSize);
+  switch(currentSort) {
+    case "name-asc":    list.sort((a,b)=>a.title.localeCompare(b.title)); break;
+    case "name-desc":   list.sort((a,b)=>b.title.localeCompare(a.title)); break;
+    case "rating-desc": list.sort((a,b)=>b.rating-a.rating); break;
+    case "size-asc":    list.sort((a,b)=>a.size-b.size); break;
+    case "size-desc":   list.sort((a,b)=>b.size-a.size); break;
+  }
+  return list;
+}
+
+/* ══ RENDER GAMES GRID ══ */
+function renderGames() {
+  const filtered = getFiltered();
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage-1)*PAGE_SIZE;
+  const page = filtered.slice(start, start+PAGE_SIZE);
+
+  document.getElementById('results-info').innerHTML =
+    `Showing <strong>${page.length}</strong> of <strong>${total}</strong> games`;
+
+  const grid = document.getElementById('games-grid');
+  grid.innerHTML = '';
+
+  if (page.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><i class="fas fa-ghost"></i><h3>No games found</h3><p>Try adjusting your search or filters</p></div>`;
+    renderPagination(0, 1);
+    return;
+  }
+
+  page.forEach((game, idx) => {
+    const inCart = cart.some(c=>c.id===game.id);
+    const hasLocalVideo = !!GAME_LOCAL_VIDEOS[game.id];
+
+    const card = document.createElement('div');
+    card.className = 'game-card reveal' + (inCart ? ' in-cart' : '');
+    card.style.transitionDelay = (idx * 0.03) + 's';
+
+    const cartBtnLabel = inCart ? 'Added' : 'Add';
+    const cartBtnIcon  = inCart ? 'fa-check' : 'fa-cart-plus';
+
+    card.innerHTML = `
+      <div class="card-img-wrap">
+        <img src="${game.img}" alt="${game.title}"
+             onerror="this.src='https://placehold.co/220x293/050a0f/00d4ff?text=${encodeURIComponent(game.title)}'">
+        ${hasLocalVideo ? `
+        <div class="card-hover-video-wrap" id="hvw-${game.id}">
+          <video muted loop playsinline preload="none" id="hvid-${game.id}">
+            <source src="${GAME_LOCAL_VIDEOS[game.id]}" type="video/mp4">
+          </video>
+        </div>` : ''}
+        <div class="card-genre-badge">${game.genre}</div>
+        <div class="card-size-badge"><i class="fas fa-hdd"></i> ${formatSize(game.size)}</div>
+        ${game.badge ? `<div style="position:absolute;bottom:8px;left:8px;z-index:4;background:linear-gradient(135deg,#cc8800,#ffbb00);color:#000;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:20px;">${game.badge}</div>` : ''}
+        <div class="card-in-cart-tag"><i class="fas fa-check"></i> In Cart</div>
+        <div class="card-overlay">
+          <div class="card-overlay-title">${game.title}</div>
+          <div class="card-overlay-actions">
+            <button class="overlay-btn overlay-btn-primary" onclick="openModal(${game.id},event)">
+              <i class="fas fa-info-circle"></i> Details
+            </button>
+            <button class="overlay-btn overlay-btn-cart ${inCart?'added':''}" id="overlay-cart-${game.id}" onclick="toggleCart(${game.id},event)">
+              <i class="fas ${cartBtnIcon}"></i> <span>${cartBtnLabel}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${game.title}</div>
+        <div class="card-meta">
+          <div class="card-rating">${renderStars(game.rating)}</div>
+          <div class="card-platform"><i class="fab fa-windows"></i> ${game.platform}</div>
+        </div>
+      </div>
+      <div class="card-action">
+        <button class="card-add-btn ${inCart?'added':''}" id="card-btn-${game.id}" onclick="toggleCart(${game.id},event)">
+          <i class="fas ${inCart?'fa-check':'fa-cart-plus'}"></i>
+          <span class="btn-label">${inCart?'Added to Cart':'Add to Cart'}</span>
+        </button>
+      </div>`;
+
+    /* ── Local video hover: play on enter, pause/reset on leave ── */
+    if (hasLocalVideo) {
+      let hoverTimer;
+      card.addEventListener('mouseenter', () => {
+        hoverTimer = setTimeout(() => {
+          const vid = card.querySelector(`#hvid-${game.id}`);
+          if (vid) { vid.currentTime = 0; vid.play().catch(()=>{}); }
+        }, 250);
+      });
+      card.addEventListener('mouseleave', () => {
+        clearTimeout(hoverTimer);
+        const vid = card.querySelector(`#hvid-${game.id}`);
+        if (vid) { vid.pause(); vid.currentTime = 0; }
+      });
+    }
+
+    /* Add/Remove hover text */
+    const addBtn = card.querySelector('.card-add-btn');
+    addBtn.addEventListener('mouseenter', () => {
+      if (addBtn.classList.contains('added')) {
+        addBtn.querySelector('.btn-label').textContent = 'Remove';
+        addBtn.querySelector('i').className = 'fas fa-trash';
+      }
+    });
+    addBtn.addEventListener('mouseleave', () => {
+      if (addBtn.classList.contains('added')) {
+        addBtn.querySelector('.btn-label').textContent = 'Added to Cart';
+        addBtn.querySelector('i').className = 'fas fa-check';
+      }
+    });
+
+    const overlayCartBtn = card.querySelector('.overlay-btn-cart');
+    overlayCartBtn.addEventListener('mouseenter', () => {
+      if (overlayCartBtn.classList.contains('added')) {
+        overlayCartBtn.querySelector('span').textContent = 'Remove';
+        overlayCartBtn.querySelector('i').className = 'fas fa-trash';
+      }
+    });
+    overlayCartBtn.addEventListener('mouseleave', () => {
+      if (overlayCartBtn.classList.contains('added')) {
+        overlayCartBtn.querySelector('span').textContent = 'Added';
+        overlayCartBtn.querySelector('i').className = 'fas fa-check';
+      }
+    });
+
+    /* Card body / image → open modal */
+    card.querySelector('.card-body').addEventListener('click', () => openModal(game.id));
+    card.querySelector('.card-img-wrap').addEventListener('click', (e) => {
+      if (!e.target.closest('.card-overlay') && !e.target.closest('.card-add-btn')) openModal(game.id);
+    });
+
+    grid.appendChild(card);
+  });
+
+  requestAnimationFrame(() => {
+    grid.querySelectorAll('.reveal').forEach(el => {
+      setTimeout(() => el.classList.add('visible'), 50);
+    });
+  });
+  renderPagination(total, totalPages);
+}
+
+/* ══ PAGINATION ══ */
+function renderPagination(total, totalPages) {
+  const pag = document.getElementById('pagination');
+  pag.innerHTML = '';
+  if (totalPages <= 1) return;
+  const make = (label, page, disabled=false, active=false) => {
+    const btn = document.createElement('button');
+    btn.className = 'page-btn' + (active?' active':'');
+    btn.disabled = disabled;
+    btn.innerHTML = label;
+    if (!disabled) btn.addEventListener('click', () => {
+      currentPage = page; renderGames(); window.scrollTo({top:0,behavior:'smooth'});
+    });
+    return btn;
+  };
+  pag.appendChild(make('<i class="fas fa-chevron-left"></i>', currentPage-1, currentPage===1));
+  for(let i=1;i<=totalPages;i++) pag.appendChild(make(i,i,false,i===currentPage));
+  pag.appendChild(make('<i class="fas fa-chevron-right"></i>', currentPage+1, currentPage===totalPages));
+}
+
+/* ══ MODAL ══ */
+function openModal(id, e) {
+  if (e) e.stopPropagation();
+  const game = GAMES.find(g=>g.id===id);
+  if (!game) return;
+  currentModalGame = game;
+
+  /* Hero: use local video if available, else fallback to blurred bg image */
+  const heroVidEl    = document.getElementById('modal-hero-vid');
+  const heroVidWrap  = document.getElementById('modal-hero-video');
+  const heroBgEl     = document.getElementById('modal-hero-bg');
+  const localVid     = GAME_LOCAL_VIDEOS[id];
+
+  heroVidEl.src = '';
+  heroVidWrap.style.display = 'none';
+  heroBgEl.style.backgroundImage = `url('${game.img}')`;
+  heroBgEl.style.display = 'block';
+
+  if (localVid) {
+    heroVidEl.src = localVid;
+    heroVidEl.currentTime = 0;
+    heroVidEl.play().catch(()=>{});
+    heroVidWrap.style.display = 'block';
+  }
+
+  document.getElementById('modal-cover-img').src = game.img;
+  document.getElementById('modal-cover-img').onerror = function(){
+    this.src=`https://placehold.co/110x147/050a0f/00d4ff?text=${encodeURIComponent(game.title)}`;
+  };
+  document.getElementById('modal-genre-tag').innerHTML = `<i class="fas fa-tag"></i> ${game.genre}`;
+  document.getElementById('modal-title').textContent = game.title;
+  document.getElementById('modal-stars').innerHTML = Array.from({length:5},(_,i)=>`<i class="${i<Math.round(game.rating)?'fas':'far'} fa-star"></i>`).join('');
+  document.getElementById('modal-rating-num').textContent = game.rating.toFixed(1);
+  document.getElementById('modal-reviews').textContent = `(${Math.floor(Math.random()*8000+2000).toLocaleString()} reviews)`;
+  document.getElementById('modal-platform').textContent = game.platform;
+
+  updateModalCartBtn();
+
+  /* ── Trailer tab: local video or placeholder ── */
+  const trailerWrap = document.getElementById('modal-trailer-wrap');
+  if (localVid) {
+    trailerWrap.innerHTML = `<video controls autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;">
+      <source src="${localVid}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>`;
+  } else {
+    const ytUrl = GAME_YOUTUBE_SEARCH[id] || `https://www.youtube.com/results?search_query=${encodeURIComponent(game.title+' official trailer')}`;
+    trailerWrap.innerHTML = `
+      <div class="trailer-placeholder">
+        <div class="play-circle" onclick="window.open('${ytUrl}','_blank')">
+          <i class="fas fa-play" style="margin-left:4px;"></i>
+        </div>
+        <div class="trailer-title">${game.title} — Official Trailer</div>
+        <button class="trailer-search-btn" onclick="window.open('${ytUrl}','_blank')">
+          <i class="fab fa-youtube"></i> Watch on YouTube
+        </button>
+      </div>`;
+  }
+
+  /* Screenshots */
+  const ss = document.getElementById('modal-screenshots');
+  ss.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const div = document.createElement('div');
+    div.className='screenshot-thumb';
+    div.innerHTML=`<img src="https://placehold.co/320x180/0a1628/4fb8e8?text=${encodeURIComponent(game.title.slice(0,10))}+SS+${i+1}" alt="Screenshot">`;
+    ss.appendChild(div);
+  }
+
+  document.getElementById('modal-description').textContent = GAME_DESCRIPTIONS[id] || `An incredible gaming experience you won't want to miss. ${game.title} delivers top-tier gameplay and unforgettable moments.`;
+  document.getElementById('modal-details').innerHTML = `
+    <div class="detail-item"><div class="detail-label">Genre</div><div class="detail-value">${game.genre}</div></div>
+    <div class="detail-item"><div class="detail-label">Platform</div><div class="detail-value"><i class="fab fa-windows"></i> ${game.platform}</div></div>
+    <div class="detail-item"><div class="detail-label">File Size</div><div class="detail-value">${formatSize(game.size)}</div></div>
+    <div class="detail-item"><div class="detail-label">User Rating</div><div class="detail-value">⭐ ${game.rating.toFixed(1)} / 5.0</div></div>
+    <div class="detail-item"><div class="detail-label">Storage Type</div><div class="detail-value">SSD Recommended</div></div>
+    <div class="detail-item"><div class="detail-label">Multiplayer</div><div class="detail-value">${['Online Multiplayer','Single-player','Co-op + Single-player','PvP Multiplayer'][id%4]}</div></div>`;
+
+  const sp = GAME_SPECS[id] || GAME_SPECS.default;
+  document.getElementById('modal-specs').innerHTML = `
+    <div class="specs-card">
+      <div class="specs-card-title"><i class="fas fa-arrow-down" style="color:var(--blue-mid)"></i> Minimum Requirements</div>
+      ${Object.entries(sp.min).map(([k,v])=>`<div class="spec-row"><div class="spec-label">${k.toUpperCase()}</div><div class="spec-value">${v}</div></div>`).join('')}
+    </div>
+    <div class="specs-card">
+      <div class="specs-card-title"><i class="fas fa-arrow-up" style="color:var(--blue-bright)"></i> Recommended Requirements</div>
+      ${Object.entries(sp.rec).map(([k,v])=>`<div class="spec-row"><div class="spec-label">${k.toUpperCase()}</div><div class="spec-value">${v}</div></div>`).join('')}
+    </div>`;
+
+  document.getElementById('modal-score-num').textContent = game.rating.toFixed(1);
+  const barData = {5:70,4:20,3:6,2:2,1:2};
+  document.getElementById('modal-rating-bars').innerHTML = [5,4,3,2,1].map(s=>`
+    <div class="rating-bar-row">
+      <span class="rating-bar-label">${s}★</span>
+      <div class="rating-bar-bg"><div class="rating-bar-fill" style="width:${barData[s]}%"></div></div>
+      <span class="rating-bar-count">${barData[s]}%</span>
+    </div>`).join('');
+
+  const reviews = GAME_REVIEWS[id] || GAME_REVIEWS.default;
+  document.getElementById('modal-reviews-list').innerHTML = reviews.map(r=>`
+    <div class="review-card">
+      <div class="review-header">
+        <div>
+          <div class="review-author">${r.author}</div>
+          <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+        </div>
+        <div class="review-date">${r.date}</div>
+      </div>
+      <div class="review-text">${r.text}</div>
+    </div>`).join('');
+
+  switchTab('trailer');
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  /* Stop hero video */
+  const heroVid = document.getElementById('modal-hero-vid');
+  heroVid.pause(); heroVid.src = '';
+  document.getElementById('modal-hero-video').style.display = 'none';
+  /* Stop trailer video */
+  const trailerWrap = document.getElementById('modal-trailer-wrap');
+  const tv = trailerWrap.querySelector('video');
+  if (tv) { tv.pause(); tv.src = ''; }
+  document.getElementById('modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handleModalBackdropClick(e) {
+  if (e.target === document.getElementById('modal-backdrop')) closeModal();
+}
+function switchTab(name) {
+  const tabs = ['trailer','about','specs','reviews'];
+  document.querySelectorAll('.modal-tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===name));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id==='tab-'+name));
+}
+function openTrailerTab() { switchTab('trailer'); }
+
+function updateModalCartBtn() {
+  if (!currentModalGame) return;
+  const inCart = cart.some(c=>c.id===currentModalGame.id);
+  const btn = document.getElementById('modal-cart-btn');
+  btn.className = 'modal-btn modal-btn-primary' + (inCart?' added':'');
+  document.getElementById('modal-cart-icon').className = inCart ? 'fas fa-check' : 'fas fa-cart-plus';
+  document.getElementById('modal-cart-btn-text').textContent = inCart ? 'Added to Cart' : 'Add to Cart';
+  btn.onmouseenter = () => {
+    if (btn.classList.contains('added')) {
+      document.getElementById('modal-cart-btn-text').textContent = 'Remove from Cart';
+      document.getElementById('modal-cart-icon').className = 'fas fa-trash';
+    }
+  };
+  btn.onmouseleave = () => {
+    if (btn.classList.contains('added')) {
+      document.getElementById('modal-cart-btn-text').textContent = 'Added to Cart';
+      document.getElementById('modal-cart-icon').className = 'fas fa-check';
+    }
+  };
+}
+function modalToggleCart() {
+  if (!currentModalGame) return;
+  toggleCart(currentModalGame.id);
+  updateModalCartBtn();
+}
+
+/* ══ CART ══ */
+function toggleCart(id, e) {
+  if (e) e.stopPropagation();
+  const game = GAMES.find(g=>g.id===id);
+  const idx = cart.findIndex(c=>c.id===id);
+  if (idx > -1) {
+    cart.splice(idx, 1);
+    showToast(`<i class="fas fa-times-circle"></i> Removed: ${game.title}`);
+  } else {
+    cart.push({...game});
+    showToast(`<i class="fas fa-check-circle"></i> Added: ${game.title}`);
+  }
+  updateCartUI();
+  renderGames();
+}
+function clearCart() {
+  if (!cart.length) return;
+  cart = [];
+  showToast('<i class="fas fa-trash"></i> Cart cleared');
+  updateCartUI();
+  renderGames();
+}
+function updateCartUI() {
+  const count = cart.length;
+  const totalGB = cart.reduce((s,g)=>s+g.size, 0);
+  const badge = document.getElementById('cart-badge');
+  badge.textContent = count;
+  badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump');
+  document.getElementById('drawer-count-pill').textContent = count;
+  const itemsHTML = count === 0
+    ? `<div class="cart-empty"><i class="fas fa-shopping-cart"></i><p>Your cart is empty.<br>Browse games and add them here!</p></div>`
+    : cart.map(g=>`
+        <div class="cart-item">
+          <img class="cart-item-img" src="${g.img}" alt="${g.title}"
+               onerror="this.src='https://placehold.co/44x59/050a0f/00d4ff?text=?'">
+          <div class="cart-item-info">
+            <div class="cart-item-title">${g.title}</div>
+            <div class="cart-item-genre">${g.genre}</div>
+            <div class="cart-item-size"><i class="fas fa-hdd" style="color:var(--blue-mid)"></i> <span class="cart-item-size-val">${formatSize(g.size)}</span></div>
+          </div>
+          <button class="cart-remove" onclick="toggleCart(${g.id})"><i class="fas fa-times"></i></button>
+        </div>`).join('');
+
+  const MAX_STORAGE = 500;
+  const barPct = Math.min(100, (totalGB/MAX_STORAGE)*100);
+  const footerHTML = `
+    <div class="storage-summary">
+      <div class="storage-row">
+        <span class="storage-label"><i class="fas fa-hdd" style="color:var(--blue-mid);margin-right:6px;"></i>Storage Required</span>
+        <span class="storage-value">${formatSize(totalGB)}</span>
+      </div>
+      <div class="storage-bar-wrap"><div class="storage-bar-fill" style="width:${barPct}%"></div></div>
+      ${count > 0 ? `
+      <hr class="storage-divider">
+      <div class="storage-breakdown">
+        ${cart.map(g=>`<div class="storage-game-row"><span class="storage-game-name">${g.title}</span><span class="storage-game-size">${formatSize(g.size)}</span></div>`).join('')}
+        <hr class="storage-divider">
+        <div class="storage-total-row"><span class="storage-total-label">Total</span><span class="storage-total-val">${formatSize(totalGB)}</span></div>
+      </div>` : ''}
+    </div>
+    <button class="checkout-btn" ${count===0?'disabled':''} onclick="showToast('<i class=\\'fas fa-check-circle\\'></i> Order placed! Thank you.')">
+      <i class="fas fa-bolt"></i> Checkout (${count} game${count!==1?'s':''})
+    </button>`;
+
+  document.getElementById('drawer-cart-items').innerHTML = itemsHTML;
+  document.getElementById('drawer-cart-footer').innerHTML = footerHTML;
+}
+function openDrawer() {
+  document.getElementById('cart-drawer').classList.add('open');
+  document.getElementById('cart-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ══ TOAST ══ */
+function showToast(msg) {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast'; t.innerHTML = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 2300);
+}
+
+/* ══ SEARCH ══ */
+const searchInput = document.getElementById('search-input');
+const searchClear = document.getElementById('search-clear');
+searchInput.addEventListener('input', () => {
+  currentSearch = searchInput.value.trim();
+  searchClear.style.display = currentSearch ? 'block' : 'none';
+  currentPage = 1; renderGames();
+});
+function clearSearch() {
+  searchInput.value = ''; currentSearch = '';
+  searchClear.style.display = 'none'; currentPage = 1; renderGames();
+}
+
+/* ══ SORT + SIZE ══ */
+document.getElementById('sort-select').addEventListener('change', e => {
+  currentSort = e.target.value; currentPage = 1; renderGames();
+});
+const sizeRange = document.getElementById('size-range');
+const sizeLabel = document.getElementById('size-label');
+const maxGameSize = Math.ceil(Math.max(...GAMES.map(g=>g.size)));
+sizeRange.max = maxGameSize; sizeRange.value = maxGameSize;
+sizeLabel.textContent = maxGameSize + ' GB'; maxSize = maxGameSize;
+sizeRange.addEventListener('input', () => {
+  maxSize = parseFloat(sizeRange.value);
+  sizeLabel.textContent = maxSize + ' GB'; currentPage = 1; renderGames();
+});
+
+/* ══ THEME ══ */
+let isDark = true;
+document.getElementById('theme-btn').addEventListener('click', () => {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-icon').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+});
+
+/* ══ KEYBOARD ══ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeDrawer(); }
+});
+
+/* ══ PARTICLES ══ */
+(function() {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, pts = [];
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  class P {
+    constructor(){ this.reset(); }
+    reset(){ this.x=Math.random()*W; this.y=Math.random()*H; this.r=Math.random()*1.2+0.2; this.dx=(Math.random()-.5)*.25; this.dy=(Math.random()-.5)*.25; this.a=Math.random()*.4+.08; }
+    update(){ this.x+=this.dx; this.y+=this.dy; if(this.x<0||this.x>W||this.y<0||this.y>H) this.reset(); }
+    draw(){ ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fillStyle=`rgba(135,206,235,${this.a})`; ctx.fill(); }
+  }
+  for(let i=0;i<80;i++) pts.push(new P());
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{ p.update(); p.draw(); });
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      const d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);
+      if(d<80){ ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.strokeStyle=`rgba(135,206,235,${.06*(1-d/80)})`; ctx.lineWidth=.4; ctx.stroke(); }
+    }
+    requestAnimationFrame(loop);
+  })();
+})();
+
+/* ══ BOOT ══ */
+buildGenreLists();
+buildNewReleasesStrip();
+updateCartUI();
+renderGames();
+</script>
+</body>
+</html>
