@@ -166,13 +166,13 @@ body {
 
 /* Game controller icon */
 .loader-icon {
-    width: 80px;
-    height: 80px;
+    width: 220px;
+    height: 220px;
     position: relative;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
 }
 .loader-icon-ring {
-    width: 80px; height: 80px;
+    width: 220px; height: 220px;
     border-radius: 50%;
     border: 1.5px solid rgba(0,212,255,0.25);
     display: flex;
@@ -189,10 +189,12 @@ body {
     border: 1px solid rgba(0,212,255,0.1);
     animation: loaderRingPulse 2s ease-in-out infinite 0.4s;
 }
-.loader-icon-ring i {
-    font-size: 30px;
-    color: #00d4ff;
-    filter: drop-shadow(0 0 12px rgba(0,212,255,0.6));
+.loader-icon-ring img {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 28px;
+    filter: drop-shadow(0 0 24px rgba(0,212,255,0.75));
     animation: loaderIconFloat 3s ease-in-out infinite;
 }
 @keyframes loaderRingPulse {
@@ -1411,7 +1413,7 @@ footer {
         <!-- Controller icon -->
         <div class="loader-icon">
             <div class="loader-icon-ring">
-                <i class="fas fa-gamepad"></i>
+                <img src="img/logo.png" alt="EZPCGames">
             </div>
         </div>
 
