@@ -48,6 +48,39 @@
   --tag-bg:      rgba(0,102,204,0.08);
 }
 
+/* ═══ LOADING SCREEN ═══ */
+#game-loading-screen{position:fixed;inset:0;z-index:99999;background:#050a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.35s ease;}
+#game-loading-screen.active{opacity:1;pointer-events:all;}
+#game-loading-screen.fade-out{opacity:0;transition:opacity 0.5s ease;}
+#game-loading-screen::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,212,255,0.015) 3px,rgba(0,212,255,0.015) 4px);pointer-events:none;z-index:1;}
+#game-loading-screen::after{content:'';position:absolute;top:32px;left:32px;width:48px;height:48px;border-top:2px solid rgba(0,212,255,0.5);border-left:2px solid rgba(0,212,255,0.5);pointer-events:none;z-index:2;}
+.loader-corner-br{position:absolute;bottom:32px;right:32px;width:48px;height:48px;border-bottom:2px solid rgba(0,212,255,0.5);border-right:2px solid rgba(0,212,255,0.5);z-index:2;}
+.loader-corner-tr{position:absolute;top:32px;right:32px;width:48px;height:48px;border-top:2px solid rgba(135,206,235,0.3);border-right:2px solid rgba(135,206,235,0.3);z-index:2;}
+.loader-corner-bl{position:absolute;bottom:32px;left:32px;width:48px;height:48px;border-bottom:2px solid rgba(135,206,235,0.3);border-left:2px solid rgba(135,206,235,0.3);z-index:2;}
+.loader-content{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;width:min(480px,90vw);}
+.loader-icon{width:100px;height:100px;position:relative;margin-bottom:20px;}
+.loader-icon-ring{width:100px;height:100px;border-radius:50%;border:1px solid rgba(0,212,255,0.25);display:flex;align-items:center;justify-content:center;position:relative;animation:loaderRingPulse 2s ease-in-out infinite;}
+.loader-icon-ring::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:0.5px solid rgba(0,212,255,0.1);animation:loaderRingPulse 2s ease-in-out infinite 0.4s;}
+.loader-icon-ring img{width:70px;height:70px;object-fit:contain;border-radius:12px;filter:drop-shadow(0 0 12px rgba(0,212,255,0.6));animation:loaderIconFloat 3s ease-in-out infinite;}
+@keyframes loaderRingPulse{0%,100%{border-color:rgba(0,212,255,0.25)}50%{border-color:rgba(0,212,255,0.6);box-shadow:0 0 24px rgba(0,212,255,0.15)}}
+@keyframes loaderIconFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.loader-brand{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;background:linear-gradient(90deg,#e8f4ff 0%,#00d4ff 60%,#87CEEB 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;text-align:center;}
+.loader-subtitle{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(135,206,235,0.6);margin-bottom:30px;text-align:center;}
+.loader-tip{font-size:11px;color:rgba(135,206,235,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;text-align:center;min-height:16px;transition:opacity 0.4s;}
+.loader-track{width:100%;height:3px;background:rgba(135,206,235,0.1);border-radius:2px;position:relative;overflow:hidden;margin-bottom:10px;}
+.loader-track::before{content:'';position:absolute;inset:0;background:rgba(0,212,255,0.06);border-radius:2px;}
+.loader-bar{height:100%;width:0%;background:linear-gradient(90deg,#0066cc,#00d4ff,#87CEEB);border-radius:2px;position:relative;transition:width 0.12s linear;box-shadow:0 0 10px rgba(0,212,255,0.6),0 0 20px rgba(0,212,255,0.3);}
+.loader-bar::after{content:'';position:absolute;right:0;top:-1px;width:20px;height:5px;background:rgba(255,255,255,0.7);border-radius:2px;filter:blur(3px);}
+.loader-ticks{width:100%;display:flex;justify-content:space-between;margin-bottom:28px;padding:0 1px;}
+.loader-tick{width:1px;height:5px;background:rgba(135,206,235,0.2);border-radius:1px;transition:background 0.3s;}
+.loader-tick.lit{background:rgba(0,212,255,0.55);}
+.loader-info-row{width:100%;display:flex;justify-content:space-between;align-items:baseline;}
+.loader-pct{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#00d4ff;}
+.loader-status{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(135,206,235,0.4);}
+.loader-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+.loader-particle{position:absolute;width:2px;height:2px;background:rgba(0,212,255,0.4);border-radius:50%;animation:loaderParticleFloat linear infinite;}
+@keyframes loaderParticleFloat{0%{transform:translateY(100vh) translateX(0);opacity:0}10%{opacity:1}90%{opacity:0.4}100%{transform:translateY(-20px) translateX(var(--drift,0px));opacity:0}}
+
 /* ═══ CUSTOM CURSOR ═══ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 * { user-select: none; -webkit-user-select: none; }
@@ -673,9 +706,33 @@ header {
 .social-row { display:flex; gap:8px; }
 .social-btn { width:32px; height:32px; border-radius:7px; background:var(--glass); border:1px solid var(--glass-border); color:var(--text-muted); font-size:13px; display:flex; align-items:center; justify-content:center; transition:0.2s; text-decoration:none; }
 .social-btn:hover { background:var(--blue-deep); border-color:var(--blue); color:#fff; }
+
 </style>
 </head>
 <body>
+
+<div id="game-loading-screen" aria-hidden="true">
+  <div class="loader-corner-br"></div>
+  <div class="loader-corner-tr"></div>
+  <div class="loader-corner-bl"></div>
+  <div class="loader-particles" id="loader-particles"></div>
+  <div class="loader-content">
+    <div class="loader-icon">
+      <div class="loader-icon-ring">
+        <img src="img/logo.png" alt="EZPCGames">
+      </div>
+    </div>
+    <div class="loader-brand">EZPCGames</div>
+    <div class="loader-subtitle">Game Library</div>
+    <div class="loader-tip" id="loader-tip">Loading game library...</div>
+    <div class="loader-track"><div class="loader-bar" id="loader-bar"></div></div>
+    <div class="loader-ticks" id="loader-ticks"></div>
+    <div class="loader-info-row">
+      <div class="loader-pct" id="loader-pct">0%</div>
+      <div class="loader-status" id="loader-status">Loading...</div>
+    </div>
+  </div>
+</div>
 
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
@@ -800,6 +857,7 @@ header {
   <div class="new-releases-items" id="new-releases-items"></div>
 </div>
 
+<!-- HERO CAROUSEL -->
 <!-- MAIN LAYOUT -->
 <div class="layout">
   <aside class="sidebar">
@@ -934,6 +992,7 @@ const GAME_LOCAL_VIDEOS = {
   3: "game_video/Tekken 8 Trailer.mp4",
   4: "game_video/Hogwarts Trailer.mp4",
   13: "game_video/Resident Evil 4 Remake Trailer.mp4",
+  6: "game_video/Elden Ring.webm",
 };
 
 const GAME_YOUTUBE_SEARCH = {
@@ -1960,6 +2019,116 @@ function lbKeyHandler(e) {
   if (e.key === 'ArrowLeft')  lbNav(-1);
   if (e.key === 'ArrowRight') lbNav(1);
 }
+
+/* ══ LOADING SCREEN ══ */
+(function(){
+  const TICK_COUNT = 20;
+  const tips = [
+    'Loading game library...',
+    'Fetching the latest titles...',
+    'Preparing your game collection...',
+    'Almost ready to play...',
+    'Warming up the engines...',
+  ];
+
+  const screen   = document.getElementById('game-loading-screen');
+  const bar      = document.getElementById('loader-bar');
+  const pct      = document.getElementById('loader-pct');
+  const statusEl = document.getElementById('loader-status');
+  const tipEl    = document.getElementById('loader-tip');
+  const ticksEl  = document.getElementById('loader-ticks');
+  const partsEl  = document.getElementById('loader-particles');
+
+  // Build tick marks
+  for (let i = 0; i < TICK_COUNT; i++) {
+    const t = document.createElement('div');
+    t.className = 'loader-tick';
+    ticksEl.appendChild(t);
+  }
+
+  // Build floating particles
+  for (let i = 0; i < 22; i++) {
+    const p = document.createElement('div');
+    p.className = 'loader-particle';
+    const drift = (Math.random() - 0.5) * 120;
+    p.style.cssText = `left:${Math.random()*100}%;bottom:0;animation-duration:${4+Math.random()*6}s;animation-delay:-${Math.random()*8}s;--drift:${drift}px;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;opacity:${0.2+Math.random()*0.4}`;
+    partsEl.appendChild(p);
+  }
+
+  let progress = 0;
+  let tipIndex = 0;
+  let loaderInterval = null;
+
+  function updateTicks(val) {
+    const ticks = ticksEl.querySelectorAll('.loader-tick');
+    const lit = Math.floor((val / 100) * TICK_COUNT);
+    ticks.forEach((t, i) => t.classList.toggle('lit', i < lit));
+  }
+
+  function setProgress(val) {
+    val = Math.min(100, Math.max(0, val));
+    bar.style.width = val + '%';
+    pct.textContent = Math.round(val) + '%';
+    updateTicks(val);
+    if (val >= 100) {
+      statusEl.textContent = 'Ready!';
+      tipEl.textContent = 'Welcome to EZPCGames!';
+    }
+  }
+
+  function rotateTip() {
+    tipEl.style.opacity = '0';
+    setTimeout(() => {
+      tipIndex = (tipIndex + 1) % tips.length;
+      tipEl.textContent = tips[tipIndex];
+      tipEl.style.opacity = '1';
+    }, 400);
+  }
+
+  // Show screen immediately
+  screen.classList.add('active');
+  screen.removeAttribute('aria-hidden');
+  tipEl.textContent = tips[0];
+  setProgress(0);
+  statusEl.textContent = 'Loading...';
+
+  const tipTimer = setInterval(rotateTip, 1100);
+
+  const phases = [
+    { target: 30,  speed: 18, interval: 40 },
+    { target: 65,  speed: 8,  interval: 55 },
+    { target: 88,  speed: 4,  interval: 70 },
+    { target: 100, speed: 2,  interval: 80 },
+  ];
+  let phaseIdx = 0;
+
+  function runPhase() {
+    if (phaseIdx >= phases.length) return;
+    const phase = phases[phaseIdx];
+    loaderInterval = setInterval(() => {
+      progress += phase.speed * (0.7 + Math.random() * 0.6);
+      if (progress >= phase.target) {
+        progress = phase.target;
+        setProgress(progress);
+        clearInterval(loaderInterval);
+        phaseIdx++;
+        if (phaseIdx < phases.length) {
+          setTimeout(runPhase, 120);
+        } else {
+          clearInterval(tipTimer);
+          setTimeout(() => {
+            screen.classList.add('fade-out');
+            setTimeout(() => { screen.style.display = 'none'; }, 550);
+          }, 380);
+        }
+      } else {
+        setProgress(progress);
+      }
+    }, phase.interval);
+  }
+
+  runPhase();
+})();
 
 /* ══ BOOT ══ */
 buildGenreLists();
