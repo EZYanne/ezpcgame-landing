@@ -76,6 +76,30 @@ body {
 }
 
 /* ═══════════════════════════════════════════
+   CUSTOM SCROLLBAR
+═══════════════════════════════════════════ */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, var(--blue-deep), var(--blue-bright));
+    border-radius: 50px;
+    border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--blue-bright);
+    box-shadow: 0 0 10px var(--blue-glow);
+}
+/* For Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue-mid) var(--bg);
+}
+
+/* ═══════════════════════════════════════════
    GAMING LOADING SCREEN
 ═══════════════════════════════════════════ */
 #game-loading-screen {
@@ -166,15 +190,15 @@ body {
 
 /* Game controller icon */
 .loader-icon {
-    width: 220px;
-    height: 220px;
+    width: 100px;
+    height: 100px;
     position: relative;
-    margin-bottom: 32px;
+    margin-bottom: 20px;
 }
 .loader-icon-ring {
-    width: 220px; height: 220px;
+    width: 100px; height: 100px;
     border-radius: 50%;
-    border: 1.5px solid rgba(0,212,255,0.25);
+    border: 1px solid rgba(0,212,255,0.25);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -184,17 +208,17 @@ body {
 .loader-icon-ring::before {
     content: '';
     position: absolute;
-    inset: -6px;
+    inset: -4px;
     border-radius: 50%;
-    border: 1px solid rgba(0,212,255,0.1);
+    border: 0.5px solid rgba(0,212,255,0.1);
     animation: loaderRingPulse 2s ease-in-out infinite 0.4s;
 }
 .loader-icon-ring img {
-    width: 180px;
-    height: 180px;
+    width: 70px;
+    height: 70px;
     object-fit: contain;
-    border-radius: 28px;
-    filter: drop-shadow(0 0 24px rgba(0,212,255,0.75));
+    border-radius: 12px;
+    filter: drop-shadow(0 0 12px rgba(0,212,255,0.6));
     animation: loaderIconFloat 3s ease-in-out infinite;
 }
 @keyframes loaderRingPulse {
@@ -209,21 +233,21 @@ body {
 /* Brand title */
 .loader-brand {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 36px;
-    letter-spacing: 4px;
+    font-size: 28px;
+    letter-spacing: 3px;
     background: linear-gradient(90deg, #e8f4ff 0%, #00d4ff 60%, #87CEEB 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     text-align: center;
 }
 .loader-subtitle {
-    font-size: 10px;
-    letter-spacing: 5px;
+    font-size: 9px;
+    letter-spacing: 4px;
     text-transform: uppercase;
     color: rgba(135,206,235,0.6);
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     text-align: center;
 }
 
@@ -563,7 +587,10 @@ nav a:hover::after { transform: translateX(-50%) scaleX(1); }
     width: 100%; height: 100%;
     object-fit: cover;
     filter: brightness(0.5) saturate(0.85);
-    transition: filter 0.5s;
+    transition: filter 0.5s, opacity 0.8s ease-in-out;
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 .carousel .list .item::after {
@@ -749,39 +776,40 @@ nav a:hover::after { transform: translateX(-50%) scaleX(1); }
     box-shadow: 0 0 8px var(--blue-bright);
 }
 .carousel.next .time, .carousel.prev .time {
-    animation: runningTime 3s linear 1 forwards;
+    animation: runningTime 10s linear 1 forwards;
 }
 @keyframes runningTime { from { width: 100% } to { width: 0 } }
 
-/* Slide animations */
+/* Slide animations — CLEAN CROSS-FADE */
+.carousel .list .item {
+    transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+}
+
 .carousel.next .list .item:nth-child(1) {
-    z-index: 2;
-    animation: slideInNext 0.55s cubic-bezier(.4,0,.2,1) forwards;
+    opacity: 0;
+    transform: scale(0.95);
+    z-index: 1;
 }
 .carousel.next .list .item:nth-child(2) {
-    z-index: 1; opacity: 1;
-}
-@keyframes slideInNext {
-    from { clip-path: inset(0 100% 0 0); opacity: 0.5; }
-    to   { clip-path: inset(0 0% 0 0); opacity: 1; }
+    opacity: 1;
+    transform: scale(1);
+    z-index: 2;
 }
 
 .carousel.prev .list .item:nth-child(1) {
-    z-index: 2; opacity: 1;
-    animation: slideOutPrev 0.55s cubic-bezier(.4,0,.2,1) forwards;
+    opacity: 1;
+    transform: scale(1);
+    z-index: 2;
 }
 .carousel.prev .list .item:nth-child(2) {
-    z-index: 3; opacity: 1;
-    animation: slideInPrev 0.55s cubic-bezier(.4,0,.2,1) forwards;
+    opacity: 0;
+    transform: scale(1.05);
+    z-index: 1;
 }
-@keyframes slideOutPrev {
-    from { clip-path: inset(0 0% 0 0); opacity: 1; }
-    to   { clip-path: inset(0 100% 0 0); opacity: 0.5; }
-}
-@keyframes slideInPrev {
-    from { clip-path: inset(0 0 0 100%); }
-    to   { clip-path: inset(0 0 0 0%); }
-}
+
+/* Remove the old @keyframes to avoid conflict */
+@keyframes fadeInNext { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInPrev { from { opacity: 0; } to { opacity: 1; } }
 
 /* Content entrance animations */
 .carousel .list .item:nth-child(1) .content .badge,
@@ -1043,6 +1071,9 @@ section {
     display: flex; align-items: center; justify-content: center;
 }
 .game-card:hover .game-card-overlay { opacity: 1; }
+.game-card-overlay .play-btn, a.play-btn {
+    text-decoration: none;
+}
 .game-card-overlay .play-btn {
     width: 52px; height: 52px;
     background: linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
@@ -1461,7 +1492,7 @@ footer {
     </a>
     <nav>
         <a href="#">Home</a>
-        <a href="#games">Games</a>
+        <a href="games_list.html">Games</a>
         <a href="#about">About</a>
         <a href="#" class="nav-cta">Shop Now</a>
     </nav>
@@ -1673,7 +1704,7 @@ footer {
                 <div class="section-label reveal">Game Library</div>
                 <h2 class="section-title reveal reveal-delay-1">Featured <span>Titles</span></h2>
             </div>
-            <a href="#" class="view-all reveal reveal-delay-2">
+            <a href="games_list.html" class="view-all reveal reveal-delay-2">
                 View All Games <i class="fas fa-arrow-right"></i>
             </a>
         </div>
@@ -1681,7 +1712,7 @@ footer {
             <div class="game-card reveal reveal-delay-1">
                 <div class="game-card-img">
                     <img src="img/GodRagnarok.jpg" alt="God of War" onerror="this.src='https://placehold.co/220x293/080d14/00d4ff?text=God+of+War'">
-                    <div class="game-card-overlay"><button class="play-btn"><i class="fas fa-play"></i></button></div>
+                    <div class="game-card-overlay"><a class="play-btn" href="games_list.html"><i class="fas fa-play"></i></a></div>
                     <div class="game-badge">Hot</div>
                 </div>
                 <div class="game-card-body">
@@ -1695,7 +1726,7 @@ footer {
             <div class="game-card reveal reveal-delay-2">
                 <div class="game-card-img">
                     <img src="img/Spider2.jpeg" alt="Spider-Man 2" onerror="this.src='https://placehold.co/220x293/080d14/00d4ff?text=Spider-Man+2'">
-                    <div class="game-card-overlay"><button class="play-btn"><i class="fas fa-play"></i></button></div>
+                    <div class="game-card-overlay"><a class="play-btn" href="games_list.html"><i class="fas fa-play"></i></a></div>
                     <div class="game-badge">New</div>
                 </div>
                 <div class="game-card-body">
@@ -1709,7 +1740,7 @@ footer {
             <div class="game-card reveal reveal-delay-3">
                 <div class="game-card-img">
                     <img src="img/Tekken8.jpg" alt="Tekken 8" onerror="this.src='https://placehold.co/220x293/080d14/00d4ff?text=Tekken+8'">
-                    <div class="game-card-overlay"><button class="play-btn"><i class="fas fa-play"></i></button></div>
+                    <div class="game-card-overlay"><a class="play-btn" href="games_list.html"><i class="fas fa-play"></i></a></div>
                     <div class="game-badge">Top</div>
                 </div>
                 <div class="game-card-body">
@@ -1723,7 +1754,7 @@ footer {
             <div class="game-card reveal reveal-delay-4">
                 <div class="game-card-img">
                     <img src="img/Hogwarts.jpg" alt="Hogwarts Legacy" onerror="this.src='https://placehold.co/220x293/080d14/00d4ff?text=Hogwarts'">
-                    <div class="game-card-overlay"><button class="play-btn"><i class="fas fa-play"></i></button></div>
+                    <div class="game-card-overlay"><a class="play-btn" href="games_list.html"><i class="fas fa-play"></i></a></div>
                 </div>
                 <div class="game-card-body">
                     <div class="game-card-title">Hogwarts Legacy</div>
@@ -1736,7 +1767,7 @@ footer {
             <div class="game-card reveal reveal-delay-1">
                 <div class="game-card-img">
                     <img src="img/RDR2.jpg" alt="RDR2" onerror="this.src='https://placehold.co/220x293/080d14/00d4ff?text=RDR2'">
-                    <div class="game-card-overlay"><button class="play-btn"><i class="fas fa-play"></i></button></div>
+                    <div class="game-card-overlay"><a class="play-btn" href="games_list.html"><i class="fas fa-play"></i></a></div>
                 </div>
                 <div class="game-card-body">
                     <div class="game-card-title">Red Dead Redemption 2</div>
@@ -1749,7 +1780,7 @@ footer {
             <div class="game-card reveal reveal-delay-2">
                 <div class="game-card-img">
                     <img src="img/GodRagnarok.jpg" alt="More Games" onerror="this.src='https://placehold.co/220x293/080d14/00d4ff?text=More+Games'">
-                    <div class="game-card-overlay"><button class="play-btn"><i class="fas fa-plus"></i></button></div>
+                    <div class="game-card-overlay"><a class="play-btn" href="games_list.html"><i class="fas fa-plus"></i></a></div>
                 </div>
                 <div class="game-card-body">
                     <div class="game-card-title">+500 More Games</div>
@@ -2003,48 +2034,84 @@ const prevBtn   = document.getElementById('prev');
 const carousel  = document.getElementById('carousel');
 const list      = carousel.querySelector('.list');
 const thumbnail = carousel.querySelector('.thumbnail');
-const timeRunning = 3000;
-const timeAutoNext = 7000;
+const timeRunning = 800; // Match CSS animation duration exactly
+const timeAutoNext = 10000; // Updated to 10 seconds
 let autoTimer, transTimer, isAnimating = false;
 
 function resetAllItems() {
     const items = list.querySelectorAll('.item');
     items.forEach((el, i) => {
+        // Just manage opacity and z-index through inline styles for baseline,
+        // letting the CSS classes handle the transition when added.
         el.style.opacity = i === 0 ? '1' : '0';
-        el.style.zIndex  = i === 0 ? '1' : '0';
+        el.style.zIndex  = i === 0 ? '2' : '1';
+        el.style.transform = '';
     });
 }
 
-function showSlider(dir) {
+function showSlider(dir, targetIndex = null) {
     if (isAnimating) return;
     isAnimating = true;
 
-    const items  = list.querySelectorAll('.item');
+    const items = list.querySelectorAll('.item');
     const thumbs = thumbnail.querySelectorAll('.item');
 
-    if (dir === 'next') {
-        list.appendChild(items[0]);
-        thumbnail.appendChild(thumbs[0]);
+    if (targetIndex !== null) {
+        // Jump to specific item: move items so target is at index 1, then trigger 'next'
+        for (let i = 0; i < targetIndex - 1; i++) {
+            list.appendChild(list.querySelectorAll('.item')[0]);
+            thumbnail.appendChild(thumbnail.querySelectorAll('.item')[0]);
+        }
         carousel.classList.add('next');
+        setTimeout(() => {
+            list.appendChild(list.querySelectorAll('.item')[0]);
+            thumbnail.appendChild(thumbnail.querySelectorAll('.item')[0]);
+            carousel.classList.remove('next');
+            resetAllItems();
+            isAnimating = false;
+        }, 800);
+    } else if (dir === 'next') {
+        carousel.classList.add('next');
+        setTimeout(() => {
+            list.appendChild(list.querySelectorAll('.item')[0]);
+            thumbnail.appendChild(thumbnail.querySelectorAll('.item')[0]);
+            carousel.classList.remove('next');
+            resetAllItems();
+            isAnimating = false;
+        }, 800);
     } else {
+        // For 'prev', move before starting animation to let item at index 1 fade into index 2
         list.prepend(items[items.length - 1]);
         thumbnail.prepend(thumbs[thumbs.length - 1]);
         carousel.classList.add('prev');
+        setTimeout(() => {
+            carousel.classList.remove('prev');
+            resetAllItems();
+            isAnimating = false;
+        }, 800);
     }
-
-    clearTimeout(transTimer);
-    transTimer = setTimeout(() => {
-        carousel.classList.remove('next');
-        carousel.classList.remove('prev');
-        resetAllItems();
-        isAnimating = false;
-    }, timeRunning);
 
     clearTimeout(autoTimer);
     autoTimer = setTimeout(() => nextBtn.click(), timeAutoNext);
 }
 
+// Click thumbnail to show on carousel background
+function initThumbnails() {
+    const thumbs = thumbnail.querySelectorAll('.item');
+    thumbs.forEach((thumb) => {
+        thumb.onclick = () => {
+            if (isAnimating) return;
+            const currentThumbs = Array.from(thumbnail.querySelectorAll('.item'));
+            const index = currentThumbs.indexOf(thumb);
+            if (index === 0) return;
+            
+            showSlider('next', index);
+        };
+    });
+}
+
 resetAllItems();
+initThumbnails();
 autoTimer = setTimeout(() => nextBtn.click(), timeAutoNext);
 
 nextBtn.addEventListener('click', () => showSlider('next'));
