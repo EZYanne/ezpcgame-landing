@@ -370,6 +370,31 @@ a, button { cursor: none; }
 }
 [data-theme="light"] #particle-canvas { opacity: 0.15; }
 
+/* ── Light mode carousel overrides ── */
+[data-theme="light"] .carousel .list .item::after {
+    background: linear-gradient(
+        105deg,
+        rgba(5, 25, 70, 0.22) 0%,
+        rgba(0, 50, 120, 0.08) 52%,
+        rgba(0, 180, 255, 0.01) 100%
+    );
+}
+[data-theme="light"] .carousel .list .item .content {
+    color: #fff;
+}
+[data-theme="light"] .carousel .list .item .title {
+    text-shadow: 0 3px 24px rgba(0, 20, 80, 0.45);
+}
+[data-theme="light"] .carousel .list .item .des {
+    color: rgba(255, 255, 255, 0.96);
+    text-shadow: 0 1px 8px rgba(0, 20, 60, 0.35);
+}
+[data-theme="light"] .carousel .list .item .badge {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.42);
+    color: #a8e6ff;
+}
+
 /* ═══════════════════════════════════════════
    NAVIGATION
 ═══════════════════════════════════════════ */
