@@ -1354,10 +1354,11 @@ function openModal(id, e) {
 
   const trailerWrap = document.getElementById('modal-trailer-wrap');
   if (localVid) {
-    trailerWrap.innerHTML = `<video controls autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;">
+    trailerWrap.innerHTML = `<video controls autoplay loop playsinline style="width:100%;height:100%;object-fit:cover;">
       <source src="${localVid}" type="video/mp4">
       Your browser does not support the video tag.
     </video>`;
+    trailerWrap.querySelector('video').play().catch(()=>{});
   } else {
     const ytUrl = GAME_YOUTUBE_SEARCH[id] || `https://www.youtube.com/results?search_query=${encodeURIComponent(game.title+' official trailer')}`;
     trailerWrap.innerHTML = `
@@ -1454,7 +1455,7 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 function handleModalBackdropClick(e) {
-  if (e.target === document.getElementById('modal-backdrop')) closeModal();
+  // disabled — modal only closes via the close button
 }
 function switchTab(name) {
   const tabs = ['trailer','about','specs','reviews'];
@@ -1798,7 +1799,7 @@ document.getElementById('theme-btn').addEventListener('click', () => {
 
 /* ══ KEYBOARD ══ */
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeDrawer(); }
+  if (e.key === 'Escape') { closeDrawer(); }
 });
 
 /* ══ PARTICLES ══ */
